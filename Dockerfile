@@ -7,10 +7,7 @@ COPY . /opt/barracuda-thruster-output-server
 WORKDIR /opt
 
 # Install dependencies for the IMU sensor and update other tools
-RUN apt-get update && apt-get install -y \ 
-    udev \
-    usbutils \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && rm -rf /var/lib/apt/lists/*
 
 # Source the workspace on container start
 CMD ["/bin/bash", "/opt/barracuda-thruster-output-server/entrypoint.sh"]
