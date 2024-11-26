@@ -7,8 +7,5 @@ services:
     container_name: barracuda-thruster-ouput-server
     tty: true
     network_mode: host
-    environment:
-      - VENDOR_ID=${VENDOR_ID}
-      - PRODUCT_ID=${PRODUCT_ID}
     restart: always
     privileged: true
