@@ -1,10 +1,10 @@
 services:
-  barracuda-thruster-ouput-server:
+  barracuda-thruster-output-server:
     build:
       context: .
       dockerfile: Dockerfile
     user: root
-    container_name: barracuda-thruster-ouput-server
+    container_name: barracuda-thruster-output-server
     tty: true
     network_mode: host
     dns:

@@ -7,7 +7,7 @@ catkin_make
 source devel/setup.bash
 
 # Start the launch file (add --wait after other node starts roscore)
-roslaunch barracuda_thruster_output_server barracuda_thruster_output_server.launch --wait
+# roslaunch barracuda_thruster_output_server barracuda_thruster_output_server.launch --wait
 
 # Following is for debugging purposes
 
