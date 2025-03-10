@@ -1,1 +1,1 @@
-# barracuda-thruster-output-server
+# barracuda-thruster-output-controller
