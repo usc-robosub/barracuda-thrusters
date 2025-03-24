@@ -1,12 +1,16 @@
 services:
-  barracuda-thruster-output-server:
+  barracuda-thruster-output-controller:
     build:
       context: .
       dockerfile: Dockerfile
     user: root
-    container_name: barracuda-thruster-output-server
+    image: barracuda-thruster-output-controller
+    container_name: thruster-controller
     tty: true
     network_mode: host
+    restart: "always"
     dns:
       - 192.168.1.1
-    restart: always
+    volumes:
+      - $HOME/.gitconfig:/root/.gitconfig:ro
+      - $HOME/.ssh:/root/.ssh
