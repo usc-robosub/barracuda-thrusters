@@ -9,8 +9,8 @@ services:
     tty: true
     network_mode: host
     restart: "always"
-    dns:
-      - 192.168.1.1
     volumes:
-      - $HOME/.gitconfig:/root/.gitconfig:ro
+      # - $HOME/.gitconfig:/root/.gitconfig:ro
       - $HOME/.ssh:/root/.ssh
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
