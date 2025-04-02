@@ -1,0 +1,16 @@
+services:
+  barracuda-thruster-output-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: root
+    image: barracuda-thruster-output-controller
+    container_name: thruster-controller
+    tty: true
+    network_mode: host
+    restart: "always"
+    volumes:
+      # - $HOME/.gitconfig:/root/.gitconfig:ro
+      - $HOME/.ssh:/root/.ssh
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
