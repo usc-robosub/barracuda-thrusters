@@ -26,3 +26,7 @@
 6. While in the remote window connected to the RPi, open the Remote Explorer extension again and select "Dev Containers" from the dropdown menu at the topc of the screen, to the right of the "Remote Explorer" text. The container you just ran should show up; attach to the container in a window. 
 7. Now you should be able to edit files, commit & push changes, and interact with the shell in the integrated terminal. 
 
+### Interfacing with the ROS Node
+This node subscribes to topics named ```thrusters/i/input``` for i in {0, ..., 7} (each thruster has an associated topic), and the message type published to these topics should be uuv_gazebo_ros_plugins_msgs/FloatStamped (this message type is defined in the uuv_gazebo_ros_plugins_msgs package so you will need to import it if publishing to the thruster topics).
+
+This node does not publish to any topics. 
