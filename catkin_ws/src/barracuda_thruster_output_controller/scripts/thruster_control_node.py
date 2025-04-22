@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 import RPi.GPIO as GPIO
-from barracuda_thruster_output_controller.srv import DisableThrusters, EnableThrusters
+from barracuda_thruster_output_controller.srv import SetThruster
 
 # once a certain treshold has been reached, send out a kill signal
 
