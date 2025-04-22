@@ -55,8 +55,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  DisableThrusters.srv
-  EnableThrusters.srv
+  SetThrusters.srv
 )
 
 ## Generate actions in the 'action' folder

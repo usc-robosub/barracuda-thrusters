@@ -7,15 +7,12 @@ from barracuda_thruster_output_controller.srv import DisableThrusters, EnableThr
 
 DISABLE_PIN = 24
 
-def disable_thrusters_handler():
-    GPIO.output(DISABLE_PIN, GPIO.HIGH)
+def thrusters_control_handler(req):
+    if req.status:
+        GPIO.output(DISABLE_PIN, GPIO.HIGH)
+    else
+        GPIO.output(DISABLE_PIN, GPIO.LOW)
 
-    return True
-
-def enable_thrusters_handler():
-    GPIO.output(DISABLE_PIN, GPIO.LOW)
-    
-    return True
 
 def main():
     rospy.init_node('thruster_disable_node')
@@ -23,9 +20,8 @@ def main():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(DISABLE_PIN, GPIO.OUT)
 
-    disable_service = rospy.service('disable_thruster', DisableThrusters, disable_thrusters_handler)
-    enable_service = rospy.service('enable_thruster', EnableThrusters, enable_thrusters_handler)
-
+    thruster_service = rospy.service('thrustcontr', SetThruster, thrusters_control_handler)
+     
     rospy.spin()
 
 
