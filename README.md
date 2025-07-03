@@ -29,4 +29,24 @@
 ### Interfacing with the ROS Node
 This node subscribes to topics named ```thrusters/i/input``` for i in {0, ..., 7} (each thruster has an associated topic), and the message type published to these topics should be uuv_gazebo_ros_plugins_msgs/FloatStamped (this message type is defined in the uuv_gazebo_ros_plugins_msgs package so you will need to import it if publishing to the thruster topics).
 
-This node does not publish to any topics. 
+This node does not publish to any topics.
+
+#### Kill Switch Service
+The node provides a ```disable_motors``` service of type ```barracuda_thruster_output_controller/DisableMotors``` that acts as a software kill switch:
+- **Request**: ```bool disable``` - true to disable motors (kill switch ON), false to enable motors (kill switch OFF)
+- **Response**: ```bool success``` and ```string message``` - indicates if the operation was successful
+
+When the kill switch is activated (```disable=true```), all thrusters are immediately set to zero duty cycle regardless of any input force values received. The kill switch state persists until explicitly disabled.
+
+Example usage:
+```bash
+# Enable kill switch (disable all motors)
+rosservice call /disable_motors "disable: true"
+
+# Disable kill switch (enable motors)
+rosservice call /disable_motors "disable: false"
+
+# Test the kill switch functionality
+rosrun barracuda_thruster_output_controller test_kill_switch.py true   # Enable kill switch
+rosrun barracuda_thruster_output_controller test_kill_switch.py false  # Disable kill switch
+``` 

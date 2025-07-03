@@ -1,0 +1,6 @@
+# Request
+bool disable  # true to disable motors (kill switch ON), false to enable motors (kill switch OFF)
+---
+# Response
+bool success    # true if operation was successful
+string message  # status message

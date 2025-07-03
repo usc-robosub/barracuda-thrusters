@@ -1,0 +1,27 @@
+<launch>
+    
+    <!-- Main thruster controller node with kill switch service -->
+    <node pkg="barracuda_thruster_output_controller" 
+          type="rpi_thruster_controller.py" 
+          name="barracuda_thruster_controller" 
+          output="screen">
+    </node>
+    
+    <!-- Launch the test publisher node -->
+    <node pkg="barracuda_thruster_output_controller" 
+          type="test_publisher.py" 
+          name="thruster_test_publisher" 
+          output="screen">
+    </node>
+    
+    <!-- Optional: Kill switch test node (uncomment to enable automatic testing) -->
+    <!-- 
+    <node pkg="barracuda_thruster_output_controller" 
+          type="test_kill_switch.py" 
+          name="kill_switch_test" 
+          args="true"
+          output="screen">
+    </node>
+    -->
+    
+</launch>
