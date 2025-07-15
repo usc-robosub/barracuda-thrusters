@@ -12,6 +12,10 @@ import rospy
 from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 from thruster_data_handler import ThrusterDataHandler
 from collections import namedtuple
+import RPi.GPIO as GPIO
+from barracuda_thruster_msgs.srv import SetThrustZero
+
+DISABLE_PIN = 24
 
 # TODO: set up thrust config in config dir/use parameters 
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
@@ -45,13 +49,36 @@ def on_recv_thruster_kgf(msg, thruster_id):
     
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
     
+# software kill switch service to stop thrusters
+def set_thruster_zero():
+    service_name = '/set_thrust_zero'
+    rospy.wait_for_service(service_name)
+    try:
+        set_thruster_zero_srv = rospy.ServiceProxy(service_name, SetThrustZero)
+        resp = set_thruster_zero_srv()  # no arguments since request is empty
+        if resp.success:
+            print(f"Service call succeeded: {resp.message}")
+        else:
+            print(f"Service call failed: {resp.message}")
+    except rospy.ServiceException as e:
+        print(f"Service call failed: {e}")
+
+def check_disable_pin(event):
+    if GPIO.input(DISABLE_PIN) == GPIO.LOW:
+        set_thruster_zero()
+
 def thruster_controller_node():
     rospy.init_node('barracuda_thruster_output_controller')
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(DISABLE_PIN, GPIO.IN)
+
     # Create subscribers for each thruster
     for i in range(8):
         topic = f"/thrusters/{i}/input"
-        rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)
+        rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)   
     
+    rospy.Timer(rospy.Duration(0.1), check_disable_pin)
     rospy.spin()   
     
 # Helper functions

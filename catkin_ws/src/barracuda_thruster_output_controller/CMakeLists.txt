@@ -10,6 +10,8 @@ project(barracuda_thruster_output_controller)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
+  message_generation
+  barracuda_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -56,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   SetThrusters.srv
+  KillThrusters.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -66,10 +69,11 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  barracuda_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -105,6 +109,7 @@ catkin_package(
 #  LIBRARIES barracuda_thruster_output_controller
 #  CATKIN_DEPENDS rospy std_msgs
 #  DEPENDS system_lib
+  barracuda_msgs
 )
 
 ###########
