@@ -12,10 +12,5 @@
           name="thruster_test_publisher" 
           output="screen">
     </node>
-
-    <node pkg="barracuda_thruster_output_controller"
-          type="disable_thruster_node.py"
-          name="disable_control">
-    </node>
     
 </launch>
