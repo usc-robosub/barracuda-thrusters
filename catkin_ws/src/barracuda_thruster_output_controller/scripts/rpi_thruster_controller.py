@@ -12,6 +12,10 @@ import rospy
 from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 from thruster_data_handler import ThrusterDataHandler
 from collections import namedtuple
+import RPi.GPIO as GPIO
+from barracuda_thruster_msgs.srv import SetThrustZero
+
+DISABLE_PIN = 24
 
 # TODO: set up thrust config in config dir/use parameters 
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
@@ -45,13 +49,51 @@ def on_recv_thruster_kgf(msg, thruster_id):
     
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
     
+# software kill switch service to stop thrusters
+def set_thruster_zero(enable_thrust_zero):
+    rospy.wait_for_service("set_thrust_zero")
+    try:
+        set_thruster_zero_srv = rospy.ServiceProxy("set_thrust_zero", SetThrustZero)
+        resp = set_thruster_zero_srv(enable_thrust_zero) 
+        if resp.success:
+            print(f"Service call succeeded: {resp.message}")
+        else:
+            print(f"Service call failed: {resp.message}")
+    except rospy.ServiceException as e:
+        print(f"Service call failed: {e}")
+
+def check_disable_pin(event):
+    global past_enable, enable
+    past_enable = enable
+    enable = GPIO.input(DISABLE_PIN)
+
+    # via edge detection, if the pin goes from low to high, rising edge, we disable the thrusters
+    if(enable == GPIO.HIGH and past_enable == GPIO.LOW):
+        set_thruster_zero(True)    
+
+    # I think the current plan was to not have the thrusters be re-enabled, but if we want to re-enable them, we can uncommenting the next line
+    #elif enable == GPIO.LOW and past_enable == GPIO.HIGH:
+    #    set_thruster_zero(False)  # Falling edge (re-enable)
+    
 def thruster_controller_node():
+
+    global past_enable, enable
+    enable = GPIO.input(DISABLE_PIN)
+    past_enable = enable
+
     rospy.init_node('barracuda_thruster_output_controller')
+
+    set_thruster_zero(False)  # enable thrusters by default
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(DISABLE_PIN, GPIO.IN)
+
     # Create subscribers for each thruster
     for i in range(8):
         topic = f"/thrusters/{i}/input"
-        rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)
+        rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)   
     
+    rospy.Timer(rospy.Duration(0.1), check_disable_pin)
     rospy.spin()   
     
 # Helper functions
