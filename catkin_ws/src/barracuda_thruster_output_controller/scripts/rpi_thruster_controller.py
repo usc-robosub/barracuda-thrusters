@@ -35,8 +35,8 @@ bus = SMBus(1)
 
 # TODO: make these ros parameters
 # configuration values for teensy 
-pwm_frequency = 400 # period = 2500 µs --> frequency = 400 Hz
-pwm_bit_resolution = 15 # highest bit resolution allowed for pwm signals on teensy
+pwm_frequency = 333 # 
+pwm_bit_resolution = 8 
     
 def on_recv_thruster_kgf(msg, thruster_id):
     pwm_us = thruster_data_handler.kgf_to_pwm_us(msg.data)
