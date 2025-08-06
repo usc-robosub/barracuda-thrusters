@@ -16,7 +16,7 @@ add_message_files(
 add_service_files(
   FILES
   SetThrusterEfficiency.srv
-  SetThrusterState.srv
+  #  SetThrusterState.srv
   GetThrusterEfficiency.srv
   GetThrusterState.srv
   SetUseGlobalCurrentVel.srv
