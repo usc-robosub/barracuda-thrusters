@@ -89,6 +89,8 @@ def test_publisher_node():
         
     print("Thruster test publisher finished.")
 
+    rospy.spin()
+
 def main():
     try:
         test_publisher_node()

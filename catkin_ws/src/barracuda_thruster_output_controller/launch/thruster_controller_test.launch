@@ -1,9 +1,9 @@
 <launch>
     
-    <!-- <node pkg="barracuda_thruster_output_controller" 
-          type="rpi_thruster_controller.py" 
-          name="barracuda_thruster_controller" 
-          output="screen">
+<!-- <node pkg="barracuda_thruster_output_controller" 
+  type="rpi_thruster_controller.py" 
+  name="barracuda_thruster_controller" 
+  output="screen">
     </node> -->
     
     <!-- Launch the test publisher node -->
