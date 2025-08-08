@@ -13,7 +13,7 @@ from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 from thruster_data_handler import ThrusterDataHandler
 from collections import namedtuple
 import RPi.GPIO as GPIO
-from barracuda_thruster_msgs.srv import SetThrustZero
+from barracuda_msgs.srv import SetThrustZero
 
 DISABLE_PIN = 24
 
