@@ -1,4 +1,6 @@
+#!/bin/bash
 source /opt/ros/noetic/setup.bash
-[ -f /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash ] && source /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash
-# exec tail -f /dev/null
+cd /opt/barracuda-thruster-output-controller/catkin_ws
+catkin_make
+source devel/setup.bash
 roslaunch barracuda_thruster_output_controller thruster_controller.launch

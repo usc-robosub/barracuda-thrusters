@@ -14,3 +14,8 @@ services:
       - $HOME/.ssh:/root/.ssh
     devices:
       - /dev/i2c-1:/dev/i2c-1
+    environment:
+      - ROS_MASTER_URI=http://192.168.2.1:11311
+      - ROS_HOSTNAME=192.168.2.148
+      - ROS_DISTRO=noetic
+    privileged: true
