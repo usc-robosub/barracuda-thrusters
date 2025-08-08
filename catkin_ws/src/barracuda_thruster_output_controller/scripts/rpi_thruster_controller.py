@@ -39,7 +39,7 @@ pwm_frequency = 333 #
 pwm_bit_resolution = 8 
     
 def on_recv_thruster_kgf(msg, thruster_id):
-    pwm_us = thruster_data_handler.kgf_to_pwm_us(msg.data)
+    pwm_us = thruster_data_handler.kgf_to_pwm_us(msg.data * 0.1019716) # netwon to kgf conversion
     
     # pwm_us / pwm_period = pwm_us * pwm_frequency
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
