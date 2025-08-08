@@ -20,3 +20,5 @@ services:
       - ROS_HOSTNAME=192.168.2.148
       - ROS_DISTRO=noetic
     privileged: true
+    extra_hosts:
+      - "barracuda-orin:192.168.2.1"
