@@ -21,8 +21,6 @@ RUN apt-get update && apt-get install -y \
     && echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc \
     && echo "[ -f /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash ] && source /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash" >> /root/.bashrc \ 
     && echo "cd /opt/barracuda-thruster-output-controller/catkin_ws" >> /root/.bashrc
-
-RUN cd /opt/barracuda-thruster-output-controller/catkin_ws/ && catkin_make
     
 WORKDIR /opt/barracuda-thruster-output-controller/catkin_ws/
 CMD ["/opt/barracuda-thruster-output-controller/entrypoint.sh"]

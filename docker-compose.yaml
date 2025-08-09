@@ -13,6 +13,6 @@ services:
     volumes:
       # - $HOME/.gitconfig:/root/.gitconfig:ro
       - $HOME/.ssh:/root/.ssh
-      - $PWD/catkin_ws:/opt/barracuda-thruster-output-controller/catkin_ws
+      # - $PWD/catkin_ws:/opt/barracuda-thruster-output-controller/catkin_ws
     devices:
       - /dev/i2c-1:/dev/i2c-1
