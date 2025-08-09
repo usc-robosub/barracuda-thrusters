@@ -1,8 +1,8 @@
 <launch>
-    
+g   
     <!-- Launch the test publisher node -->
     <node pkg="barracuda_thruster_output_controller" 
-          type="test_publisher.py" 
+          type="keyboard_test_publisher.py" 
           name="thruster_test_publisher" 
           output="screen">
     </node>
