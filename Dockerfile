@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y \
     python3-numpy \
     python3-rospy \
     python3-pip \
-    && pip3 install --no-cache-dir smbus2 sshkeyboard\
-    && apt-get purge -y python3-pip \
-    && apt-get autoremove -y \
+    && pip3 install smbus2 sshkeyboard RPi.GPIO \
+    # && apt-get purge -y python3-pip \
+    # && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod +x /opt/barracuda-thruster-output-controller/entrypoint.sh \
     && mkdir /root/.ssh && chmod 700 /root/.ssh \

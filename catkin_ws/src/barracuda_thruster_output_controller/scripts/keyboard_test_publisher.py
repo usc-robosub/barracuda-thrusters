@@ -3,6 +3,8 @@ from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 from sshkeyboard import listen_keyboard
 import threading
 from collections import namedtuple
+import time
+import os
 
 thruster_forces = [0] * 8
 
@@ -10,6 +12,10 @@ cur_thruster_idx = 0
 
 MIN_THRUSTER_FORCE = -10 # newtons
 MAX_THRUSTER_FORCE = 10 # newtons
+
+N_THRUSTERS = 4
+
+FORCE_INCREMENT = 1
 
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
 thruster_organization = {
@@ -37,43 +43,54 @@ def start_keyboard_listener():
 
 def press(key):
     global cur_thruster_idx, thruster_forces
+
+    print(key)
     if key == 'k':
-        if thruster_forces[cur_thruster_idx] - 2 >= MIN_THRUSTER_FORCE:
-            thruster_forces[cur_thruster_idx] -= 2
+        if thruster_forces[cur_thruster_idx] - FORCE_INCREMENT >= MIN_THRUSTER_FORCE:
+            thruster_forces[cur_thruster_idx] -= FORCE_INCREMENT
     if key == 'i':
-        if thruster_forces[cur_thruster_idx] + 2 <= MAX_THRUSTER_FORCE:
-            thruster_forces[cur_thruster_idx] += 2
+        if thruster_forces[cur_thruster_idx] + FORCE_INCREMENT <= MAX_THRUSTER_FORCE:
+            thruster_forces[cur_thruster_idx] += FORCE_INCREMENT
     if key == 'r':
-        for i in range(8):
+        for i in range(N_THRUSTERS):
             thruster_forces[cur_thruster_idx] = 0
+    if key == 'q':
+        os.system("stty sane")
+        rospy.signal_shutdown("program exited")
     
-    if '0' <= key <= '7':
-        cur_thruster_idxthruster_idx = int(key)
+    if '0' <= key <= f'{N_THRUSTERS - 1}':
+        cur_thruster_idx = int(key)
         print(f"cur_thruster_idx={cur_thruster_idx}")
-        cur_address = thruster_organization[thruster_idx].i2c_address
+        cur_address = thruster_organization[cur_thruster_idx].i2c_address
         print(f"cur_address={cur_address}")
-        cur_register = thruster_organization[thruster_idx].register
+        cur_register = thruster_organization[cur_thruster_idx].register
         print(f"cur_register={cur_register}")
+
+    print(f"thruster {cur_thruster_idx} force: {thruster_forces[cur_thruster_idx]}")
+
 
 def keyboard_test_publisher_node():
     global thruster_forces
     print("starting keyboard test publisher")
     rospy.init_node('thruster_test_publisher')
+
+    # test = input("test input:\n")
+    # print(test)
     # Create publishers for each thruster
     publishers = []
-    for i in range(8):
+    for i in range(N_THRUSTERS):
         topic = f"/thrusters/{i}/input"
         pub = rospy.Publisher(topic, FloatStamped, queue_size=10)
         publishers.append(pub)
     rate = rospy.Rate(20)
 
     while not rospy.is_shutdown():
-        for i in range(8):
+        for i in range(N_THRUSTERS):
             msg = FloatStamped()
             msg.header.stamp = rospy.Time.now()
             msg.data = thruster_forces[i]
-            publishers[i].publish(msg)      
+            publishers[i].publish(msg)  
 
 if __name__ == '__main__':
-    
+    start_keyboard_thread()
     keyboard_test_publisher_node()

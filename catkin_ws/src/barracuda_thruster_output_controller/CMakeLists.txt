@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  barracuda_msgs
+  # barracuda_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -55,9 +55,9 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-)
+# add_service_files(
+#   FILES
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -70,7 +70,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
-  barracuda_msgs
+  # barracuda_msgs
 )
 
 ################################################
@@ -107,7 +107,7 @@ catkin_package(
 #  LIBRARIES barracuda_thruster_output_controller
 #  CATKIN_DEPENDS rospy std_msgs
 #  DEPENDS system_lib
-  barracuda_msgs
+  # barracuda_msgs
 )
 
 ###########
@@ -163,6 +163,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/rpi_thruster_controller.py
   scripts/keyboard_test_publisher.py
+  scripts/thruster_data_handler.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
