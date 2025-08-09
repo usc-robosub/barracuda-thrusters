@@ -127,6 +127,7 @@ if __name__ == "__main__":
 
 
 DISABLE_PIN = 24
+TMP_KILLSWITCH_PIN = 22
 
 # TODO: set up thrust config in config dir/use parameters 
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
@@ -148,6 +149,12 @@ bus = SMBus(1)
 # configuration values for teensy 
 pwm_frequency = 333 # 
 pwm_bit_resolution = 8 
+
+def on_recv_killswitch(msg):
+    if msg.data == 0:
+        print("should kill now")
+        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW)  
+
     
 def on_recv_thruster_kgf(msg, thruster_id):
     pwm_us = thruster_data_handler.kgf_to_pwm_us(msg.data * 0.1019716) # netwon to kgf conversion
@@ -160,18 +167,18 @@ def on_recv_thruster_kgf(msg, thruster_id):
     
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
     
-# software kill switch service to stop thrusters
-def set_thruster_zero(enable_thrust_zero):
-    rospy.wait_for_service("set_thrust_zero")
-    try:
-        set_thruster_zero_srv = rospy.ServiceProxy("set_thrust_zero", SetThrustZero)
-        resp = set_thruster_zero_srv(enable_thrust_zero) 
-        if resp.success:
-            print(f"Service call succeeded: {resp.message}")
-        else:
-            print(f"Service call failed: {resp.message}")
-    except rospy.ServiceException as e:
-        print(f"Service call failed: {e}")
+# # software kill switch service to stop thrusters
+# def set_thruster_zero(enable_thrust_zero):
+#     rospy.wait_for_service("set_thrust_zero")
+#     try:
+#         set_thruster_zero_srv = rospy.ServiceProxy("set_thrust_zero", SetThrustZero)
+#         resp = set_thruster_zero_srv(enable_thrust_zero) 
+#         if resp.success:
+#             print(f"Service call succeeded: {resp.message}")
+#         else:
+#             print(f"Service call failed: {resp.message}")
+#     except rospy.ServiceException as e:
+#         print(f"Service call failed: {e}")
 
 def check_disable_pin(event):
     global past_enable, enable
@@ -180,7 +187,8 @@ def check_disable_pin(event):
 
     # via edge detection, if the pin goes from low to high, rising edge, we disable the thrusters
     if(enable == GPIO.HIGH and past_enable == GPIO.LOW):
-        set_thruster_zero(True)    
+        # set_thruster_zero(True)  
+        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW)  
 
     # I think the current plan was to not have the thrusters be re-enabled, but if we want to re-enable them, we can uncommenting the next line
     #elif enable == GPIO.LOW and past_enable == GPIO.HIGH:
@@ -192,6 +200,9 @@ def thruster_controller_node():
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(DISABLE_PIN, GPIO.IN)
+    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
+    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
+
     enable = GPIO.input(DISABLE_PIN)
     past_enable = enable
 
@@ -206,7 +217,8 @@ def thruster_controller_node():
     try:
         for i in range(8):
             topic = f"/thrusters/{i}/input"
-            rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)   
+            rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)
+        rospy.Subscriber("/killswitch", FloatStamped, on_recv_killswitch)   
     except Exception as e:
         print(e)
     

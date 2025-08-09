@@ -6,6 +6,8 @@ from collections import namedtuple
 import time
 import os
 
+killswitch_val = 1
+
 thruster_forces = [0] * 8
 
 cur_thruster_idx = 0
@@ -42,7 +44,7 @@ def start_keyboard_listener():
     listen_keyboard(on_press=press, until=None)
 
 def press(key):
-    global cur_thruster_idx, thruster_forces
+    global cur_thruster_idx, thruster_forces, killswitch_val
 
     print(key)
     if key == 'k':
@@ -54,6 +56,8 @@ def press(key):
     if key == 'r':
         for i in range(N_THRUSTERS):
             thruster_forces[cur_thruster_idx] = 0
+    if key == 'd':
+        killswitch_val = 0
     if key == 'q':
         os.system("stty sane")
         rospy.signal_shutdown("program exited")
@@ -70,7 +74,7 @@ def press(key):
 
 
 def keyboard_test_publisher_node():
-    global thruster_forces
+    global thruster_forces, killswitch_val
     print("starting keyboard test publisher")
     rospy.init_node('thruster_test_publisher')
 
@@ -82,6 +86,7 @@ def keyboard_test_publisher_node():
         topic = f"/thrusters/{i}/input"
         pub = rospy.Publisher(topic, FloatStamped, queue_size=10)
         publishers.append(pub)
+    sw_killswitch_pub = rospy.Publisher("/killswitch", FloatStamped, queue_size=10)
     rate = rospy.Rate(20)
 
     while not rospy.is_shutdown():
@@ -89,7 +94,11 @@ def keyboard_test_publisher_node():
             msg = FloatStamped()
             msg.header.stamp = rospy.Time.now()
             msg.data = thruster_forces[i]
-            publishers[i].publish(msg)  
+            publishers[i].publish(msg) 
+        msg2 = FloatStamped()
+        msg2.header.stamp = rospy.Time.now()
+        msg2.data = killswitch_val
+        sw_killswitch_pub.publish(msg2) 
 
 if __name__ == '__main__':
     start_keyboard_thread()
