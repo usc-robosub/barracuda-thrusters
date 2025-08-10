@@ -15,7 +15,7 @@ from collections import namedtuple
 import RPi.GPIO as GPIO
 # from barracuda_thruster_msgs.srv import SetThrustZero
 
-
+import time
 import os
 import sys
 import numpy as np
@@ -86,7 +86,13 @@ class ThrusterDataHandler:
             return self.pwm_values[index]
         
         # Use binary search to find where the input value would fit
+        # start_time = time.time()
+
         index = np.searchsorted(self.kgf_values, kgf_input)
+
+        #end_time = time.time()
+        #elapsed_time = end_time - start_time
+        #rospy.loginfo(f"np.searchsorted took {elapsed_time:.6f} seconds")
         
         # Handle edge cases where input is outside data range
         if index == 0:
@@ -136,7 +142,7 @@ def on_recv_thruster_kgf(msg, thruster_id):
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
     # dividing by 10^3 twice to keep intermediate values smaller
     duty_cycle_val = int(round(((pwm_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
-    rospy.loginfo(f"received kgf value of: {msg.data} for thruster {thruster_id}, wrote duty cycle val: {duty_cycle_val}")
+    #rospy.loginfo(f"received kgf value of: {msg.data} for thruster {thruster_id}, wrote duty cycle val: {duty_cycle_val}")
     
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
     
@@ -171,8 +177,8 @@ def thruster_controller_node():
     global past_enable, enable
     GPIO.setmode(GPIO.BCM)
     
-    GPIO.setup(22, GPIO.OUT)
-    GPIO.output(22, GPIO.HIGH)
+    #GPIO.setup(22, GPIO.OUT)
+    #GPIO.output(22, GPIO.HIGH)
 
     GPIO.setup(DISABLE_PIN, GPIO.IN)
     enable = GPIO.input(DISABLE_PIN)
@@ -192,6 +198,8 @@ def thruster_controller_node():
             rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)   
     except Exception as e:
         print(e)
+
+    initialize_thrusters()
     
     rospy.Timer(rospy.Duration(0.1), check_disable_pin)
     rospy.spin()   
@@ -239,10 +247,28 @@ if __name__ == "__main__":
         print(f"Error: {e}")
 """
 
+def initialize_thrusters():
+    neutral_us = 1500  # adjust if your ESCs use a different neutral
+    thruster_ids = range(8)  # e.g., if you have 6 thrusters, range(6)
+    rospy.loginfo("Initializing thrusters to neutral...")
+    for tid in thruster_ids:
+        # Replace this with however your code sends to the Teensy
+        send_duty_cycle_val_to_thruster(neutral_us, tid)
+        rospy.sleep(0.05)  # short delay to avoid flooding the bus
+    rospy.loginfo("Thrusters initialized to neutral.")
+
 if __name__ == '__main__':
     try:
         handler = ThrusterDataHandler()
+        """ 
+        try:
+            kgf_test = float(sys.argv[1])
+        except (ValueError, IndexError):
+            kgf_test = 0
+        pwm_result = handler.kgf_to_pwm_us(kgf_test)
+        """
         thruster_controller_node()
+
     except rospy.ROSInterruptException:
         pass
     #finally:

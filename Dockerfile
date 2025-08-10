@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     python3-pandas \
     python3-numpy \
     python3-rospy \
+    python3-scipy \
     python3-pip \
     python3-rpi.gpio \
     && pip3 install --no-cache-dir smbus2 \
