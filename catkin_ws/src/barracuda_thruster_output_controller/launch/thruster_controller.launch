@@ -4,6 +4,7 @@
           type="rpi_thruster_controller.py" 
           name="barracuda_thruster_controller" 
           output="screen">
+          <env name="PYTHONPATH" value="$(find barracuda_thruster_output_controller)/scripts:$(optenv PYTHONPATH)" />
     </node>
     
 </launch>

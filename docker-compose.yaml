@@ -12,7 +12,7 @@ services:
     restart: "always"
     volumes:
       # - $HOME/.gitconfig:/root/.gitconfig:ro
-      - $HOME/.ssh:/root/.ssh
-      # - $PWD/catkin_ws:/opt/barracuda-thruster-output-controller/catkin_ws
+      # - $HOME/.ssh:/root/.ssh
+      - $PWD/catkin_ws/src:/opt/barracuda-thruster-output-controller/catkin_ws/src
     devices:
       - /dev/i2c-1:/dev/i2c-1
