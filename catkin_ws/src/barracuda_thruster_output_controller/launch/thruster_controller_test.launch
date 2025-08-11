@@ -4,6 +4,7 @@
           type="rpi_thruster_controller.py" 
           name="barracuda_thruster_controller" 
           output="screen">
+            <env name="PYTHONPATH" value="$(find barracuda_thruster_output_controller)/scripts:$(optenv PYTHONPATH)" />
     </node>
     
     <!-- Launch the test publisher node -->
@@ -11,6 +12,7 @@
           type="keyboard_test_publisher.py" 
           name="thruster_keyboard_test_publisher" 
           output="screen">
+            <env name="PYTHONPATH" value="$(find barracuda_thruster_output_controller)/third_party/sshkeyboard/src:$(optenv PYTHONPATH)" />
     </node>
     
 </launch>

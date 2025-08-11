@@ -9,11 +9,7 @@ RUN apt-get update && apt-get install -y \
     i2c-tools \
     python3-rospy \
     python3-smbus \
-    python3-rpi.gpio \
-    # python3-pip \
-    # && pip3 install smbus2 sshkeyboard RPi.GPIO \
-    # && apt-get purge -y python3-pip \
-    # && apt-get autoremove -y \
+    # python3-rpi.gpio \
     && rm -rf /var/lib/apt/lists/* \
     && chmod +x /opt/barracuda-thruster-output-controller/entrypoint.sh \
     && echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc \

@@ -7,7 +7,6 @@ NEWTONS_PER_KGF = 9.80665
 
 class F2PWM:
     def __init__(self, csv_filename, interpolation_mode):
-        print('F2PWM object instantiated')
         rospack = rospkg.RosPack()
         csv_path = os.path.join(rospack.get_path('barracuda_thruster_output_controller'), 'data', csv_filename)
         self.pwm_widths = []
@@ -22,7 +21,6 @@ class F2PWM:
             raise ValueError("less than lowest allowed force")
         if lut_idx == len(self.force_vals):
             raise ValueError("greater than highest allowed force")
-        # print(self.pwm_widths[lut_idx])
 
         # Get the surrounding values for interpolation
         force_under = self.force_vals[lut_idx - 1]
@@ -32,7 +30,6 @@ class F2PWM:
         
         # Linear interpolation formula: y = y1 + (x - x1) * ((y2 - y1) / (x2 - x1))
         pwm_us_interpolated = pwm_width_under + (force_newtons - force_under) * ((pwm_width_over - pwm_width_under) / (force_over - force_under))
-        print(pwm_us_interpolated)
         return pwm_us_interpolated
 
     # creates lookup table between force values (N) and PWM widths (microseconds)
