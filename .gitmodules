@@ -1,0 +1,3 @@
+[submodule "catkin_ws/src/barracuda_thruster_output_controller/third_party/sshkeyboard"]
+	path = catkin_ws/src/barracuda_thruster_output_controller/third_party/sshkeyboard
+	url = git@github.com:ollipal/sshkeyboard.git
