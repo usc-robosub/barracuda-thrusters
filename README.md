@@ -6,7 +6,7 @@
 3. Enter the container in shell mode with ```docker exec -it thruster-controller bash```
 4. From the catkin_ws dir, run ```catkin_make``` to build the barracuda_thruster_output_controller package. Then (still from the catkin_ws dir) run ```source devel/setup.bash```.
 5. Connect the SDA & SCL pins on the RPi to the SDA1 & SCL1 pins on the Teensy, and connect a ground pin on the RPi to a ground pin on the Teensy (which should have the thruster target code flashed onto it).
-6. Run the test for the thruster controller controller node with ```roslaunch barracuda_thruster_output_controller thruster_controller_test.launch```. This will run the both the thruster controller node, as well as a dummy publisher node that publishes FloatStamped messages to the thruster topics for around 10 seconds.
+6. Run the test for the thruster controller controller node with ```roslaunch barracuda_thruster_output_controller thruster_controller_test.launch```. This will run the both the thruster controller node, as well as a keyboard testing node that publishes FloatStamped messages to the thruster topics. Press a number 0-7 to change the thruster index, press k to increment and i to decrement force value (N) by 1, press r to reset all thrusters, q to quit. If you can't see what you're typing in the terminal after the keyboard test exits, run ```stty sane```.
 7. Exit the container in shell mode with ```exit```, then shut down the container with ```docker compose down```.
 
 ### RPi Setup Instructions
