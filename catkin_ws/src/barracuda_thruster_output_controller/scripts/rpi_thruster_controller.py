@@ -75,6 +75,8 @@ thruster_organization = {
     7: ThrusterConfig(0x2e, 6)
 }
 
+TMP_KILLSWITCH_PIN = 22
+
 # thruster_data_handler = ThrusterDataHandler()
 converter = F2PWM('t200_18v_data.csv', 'interpolation mode placeholder')
 
@@ -100,10 +102,17 @@ def on_recv_thruster_force(msg, thruster_id):
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
     # dividing by 10^3 twice to keep intermediate values smaller
     duty_cycle_val = int(round(((pwm_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
+
+    if thruster_id == 0:
+        print(f'sending duty cycle val {duty_cycle_val} to thruster 0')
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
     
     
 def thruster_controller_node():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
+    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
+    
     rospy.init_node('barracuda_thruster_output_controller')
     # Create subscribers for each thruster
     try:

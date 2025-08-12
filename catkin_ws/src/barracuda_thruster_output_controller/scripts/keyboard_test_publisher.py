@@ -45,7 +45,7 @@ def start_keyboard_listener():
     listen_keyboard(on_press=press, until=None)
 
 def press(key):
-    global cur_thruster_idx, thruster_forces, killswitch_val
+    global cur_thruster_idx, cur_address, cur_register, thruster_forces, killswitch_val
 
     print(key)
     if key == 'k':
