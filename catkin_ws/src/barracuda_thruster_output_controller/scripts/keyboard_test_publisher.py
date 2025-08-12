@@ -6,18 +6,6 @@ from collections import namedtuple
 import time
 import os
 
-killswitch_val = 1
-
-thruster_forces = [0] * 8
-
-MIN_THRUSTER_FORCE = -10 # newtons
-MAX_THRUSTER_FORCE = 10 # newtons
-
-THRUSTER_INDICES = [0, 1, 2, 3, 4, 5, 6 ,7]
-cur_thruster_idx = THRUSTER_INDICES[0]
-
-FORCE_INCREMENT = 1
-
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
 thruster_organization = {
     0: ThrusterConfig(0x2d, 0),
@@ -29,6 +17,20 @@ thruster_organization = {
     6: ThrusterConfig(0x2e, 4),
     7: ThrusterConfig(0x2e, 6)
 }
+
+killswitch_val = 1
+
+thruster_forces = [0] * 8
+
+MIN_THRUSTER_FORCE = -10 # newtons
+MAX_THRUSTER_FORCE = 10 # newtons
+
+THRUSTER_INDICES = [0, 1, 2, 3, 4, 5, 6 ,7]
+cur_thruster_idx = THRUSTER_INDICES[0]
+cur_address = thruster_organization[cur_thruster_idx].i2c_address
+cur_register = thruster_organization[cur_thruster_idx].register
+
+FORCE_INCREMENT = 1
 
 def start_keyboard_thread():
     try:
