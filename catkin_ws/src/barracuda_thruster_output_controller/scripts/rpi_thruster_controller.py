@@ -109,9 +109,6 @@ def on_recv_thruster_force(msg, thruster_id):
     
     
 def thruster_controller_node():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
-    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
     
     rospy.init_node('barracuda_thruster_output_controller')
     # Create subscribers for each thruster
@@ -141,4 +138,7 @@ def send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id):
 
 
 if __name__ == '__main__':
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
+    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
     thruster_controller_node()
