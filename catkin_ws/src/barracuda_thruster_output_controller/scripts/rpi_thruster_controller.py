@@ -56,7 +56,6 @@ class F2PWM:
 
 ############################################################################################################################################################
 
-
 from smbus import *
 import struct
 import rospy
@@ -76,7 +75,7 @@ thruster_organization = {
     4: ThrusterConfig(0x2e, 0),
     5: ThrusterConfig(0x2e, 2),
     6: ThrusterConfig(0x2e, 4),
-    7: ThrusterConfig(0x2e, 6)
+    7: ThrusterConfig(0x2e, 6),
 }
 
 TMP_KILLSWITCH_PIN = 22
