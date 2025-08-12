@@ -4,6 +4,7 @@ import os
 from bisect import bisect_left
 
 NEWTONS_PER_KGF = 9.80665
+STOPPED_PWM_WIDTH = 1500
 
 class F2PWM:
     def __init__(self, csv_filename, interpolation_mode):
@@ -15,6 +16,8 @@ class F2PWM:
     
     # convert force (newtons) to PWM width (microseconds)
     def to_us(self, force_newtons):
+        if force_newtons == 0:
+            return STOPPED_PWM_WIDTH
         # Find index of leftmost value greater than or equal to force_newtons
         lut_idx = bisect_left(self.force_vals, force_newtons)
         if lut_idx == 0:
