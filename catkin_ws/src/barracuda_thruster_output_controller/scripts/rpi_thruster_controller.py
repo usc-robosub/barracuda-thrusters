@@ -147,7 +147,7 @@ def send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id):
 
 
 if __name__ == '__main__':
+    GPIO.cleanup()
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
-    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
+    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT, GPIO.HIGH)
     thruster_controller_node()
