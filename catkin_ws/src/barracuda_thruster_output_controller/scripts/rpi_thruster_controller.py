@@ -121,10 +121,10 @@ thruster_organization = {
     1: ThrusterConfig(0x2d, 2),
     2: ThrusterConfig(0x2d, 4),
     3: ThrusterConfig(0x2d, 6),
-    4: ThrusterConfig(0x2d, 0),
-    5: ThrusterConfig(0x2d, 2),
-    6: ThrusterConfig(0x2d, 4),
-    7: ThrusterConfig(0x2d, 6)
+    4: ThrusterConfig(0x2e, 0),
+    5: ThrusterConfig(0x2e, 2),
+    6: ThrusterConfig(0x2e, 4),
+    7: ThrusterConfig(0x2e, 6)
 }
 
 thruster_data_handler = ThrusterDataHandler()
@@ -142,7 +142,7 @@ def on_recv_thruster_kgf(msg, thruster_id):
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
     # dividing by 10^3 twice to keep intermediate values smaller
     duty_cycle_val = int(round(((pwm_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
-    #rospy.loginfo(f"received kgf value of: {msg.data} for thruster {thruster_id}, wrote duty cycle val: {duty_cycle_val}")
+    rospy.loginfo(f"received kgf value of: {msg.data} for thruster {thruster_id}, wrote duty cycle val: {duty_cycle_val}")
     
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
     
@@ -194,12 +194,12 @@ def thruster_controller_node():
     # Create subscribers for each thruster
     try:
         for i in range(8):
-            topic = f"/thrusters/{i}/input"
+            topic = f"thrusters/{i}/input"
             rospy.Subscriber(topic, FloatStamped, on_recv_thruster_kgf, callback_args=i)   
     except Exception as e:
         print(e)
 
-    initialize_thrusters()
+    # initialize_thrusters()
     
     rospy.Timer(rospy.Duration(0.1), check_disable_pin)
     rospy.spin()   
