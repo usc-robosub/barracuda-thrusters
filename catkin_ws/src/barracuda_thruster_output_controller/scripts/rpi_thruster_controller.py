@@ -109,7 +109,7 @@ def on_recv_thruster_force(msg, thruster_id):
     # dividing by 10^3 twice to keep intermediate values smaller
     duty_cycle_val = int(round(((pwm_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
 
-    if thruster_id == 0:
+    # if thruster_id == 0:
         # print(f'sending duty cycle val {duty_cycle_val} to thruster 0')
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
 
