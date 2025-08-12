@@ -162,7 +162,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/rpi_thruster_controller.py
   scripts/keyboard_test_publisher.py
-  scripts/thruster_data_handler.py
+  scripts/F2PWM.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
