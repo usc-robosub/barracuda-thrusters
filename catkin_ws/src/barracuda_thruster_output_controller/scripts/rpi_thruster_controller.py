@@ -98,8 +98,8 @@ def on_recv_killswitch(msg):
     if msg.data == 0:
         # print("should kill now")
         GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW) 
-    if msg.data == 1: 
-        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
+    # if msg.data == 1: 
+    #     GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
 
     
 def on_recv_thruster_force(msg, thruster_id):
