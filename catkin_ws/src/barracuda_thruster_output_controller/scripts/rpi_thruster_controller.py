@@ -108,7 +108,7 @@ def thruster_controller_node():
     # Create subscribers for each thruster
     try:
         for i in range(8):
-            topic = f"/thrusters/{i}/input"
+            topic = f"thrusters/{i}/input"
             rospy.Subscriber(topic, FloatStamped, on_recv_thruster_force, callback_args=i)
         rospy.Subscriber("/killswitch", FloatStamped, on_recv_killswitch)   
     except Exception as e:

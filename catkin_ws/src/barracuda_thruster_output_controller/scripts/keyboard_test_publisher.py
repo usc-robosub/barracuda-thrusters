@@ -13,7 +13,7 @@ thruster_forces = [0] * 8
 MIN_THRUSTER_FORCE = -10 # newtons
 MAX_THRUSTER_FORCE = 10 # newtons
 
-THRUSTER_INDICES = [4, 5, 6 ,7]
+THRUSTER_INDICES = [0, 1, 2, 3, 4, 5, 6 ,7]
 cur_thruster_idx = THRUSTER_INDICES[0]
 
 FORCE_INCREMENT = 1
@@ -63,12 +63,12 @@ def press(key):
     
     if f'{THRUSTER_INDICES[0]}' <= key <= f'{THRUSTER_INDICES[-1]}':
         cur_thruster_idx = int(key)
-        print(f"cur_thruster_idx={cur_thruster_idx}")
         cur_address = thruster_organization[cur_thruster_idx].i2c_address
-        print(f"cur_address={cur_address}")
         cur_register = thruster_organization[cur_thruster_idx].register
-        print(f"cur_register={cur_register}")
 
+    print(f"cur_thruster_idx={cur_thruster_idx}")
+    print(f"cur_address={cur_address}")
+    print(f"cur_register={cur_register}")
     print(f"thruster {cur_thruster_idx} force: {thruster_forces[cur_thruster_idx]}")
 
 
@@ -80,7 +80,7 @@ def keyboard_test_publisher_node():
     # Create publishers for each thruster
     publishers = []
     for i in THRUSTER_INDICES:
-        topic = f"/thrusters/{i}/input"
+        topic = f"thrusters/{i}/input"
         pub = rospy.Publisher(topic, FloatStamped, queue_size=10)
         publishers.append(pub)
     sw_killswitch_pub = rospy.Publisher("/killswitch", FloatStamped, queue_size=10)
