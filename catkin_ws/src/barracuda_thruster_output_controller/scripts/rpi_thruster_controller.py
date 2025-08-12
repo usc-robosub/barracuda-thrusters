@@ -96,8 +96,10 @@ pwm_bit_resolution = 8
 
 def on_recv_killswitch(msg):
     if msg.data == 0:
-        print("should kill now")
-        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW)  
+        # print("should kill now")
+        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW) 
+    if msg.data == 1: 
+        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
 
     
 def on_recv_thruster_force(msg, thruster_id):
@@ -110,11 +112,14 @@ def on_recv_thruster_force(msg, thruster_id):
     if thruster_id == 0:
         # print(f'sending duty cycle val {duty_cycle_val} to thruster 0')
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
-    
+
+def shutdown_callback():
+    GPIO.cleanup()
     
 def thruster_controller_node():
     
     rospy.init_node('barracuda_thruster_output_controller')
+    rospy.on_shutdown(shutdown_callback)
     # Create subscribers for each thruster
     try:
         for i in range(8):

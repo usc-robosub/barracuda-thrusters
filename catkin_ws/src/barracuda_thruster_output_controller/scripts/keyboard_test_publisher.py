@@ -58,7 +58,7 @@ def press(key):
         for i in THRUSTER_INDICES:
             thruster_forces[i - THRUSTER_INDICES[0]] = 0
     if key == 'd':
-        killswitch_val = 0
+        killswitch_val = not killswitch_val
     if key == 'q':
         os.system("stty sane")
         rospy.signal_shutdown("program exited")
