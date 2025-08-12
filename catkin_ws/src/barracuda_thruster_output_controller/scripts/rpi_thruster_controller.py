@@ -12,7 +12,7 @@ import rospy
 from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 from F2PWM import F2PWM
 from collections import namedtuple
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 
 # TODO: set up thrust config in config dir/use parameters 
