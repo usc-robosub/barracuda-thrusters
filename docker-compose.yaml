@@ -17,11 +17,11 @@ services:
     devices:
       - /dev/i2c-1:/dev/i2c-1
       - /dev/gpiomem:/dev/gpiomem
-    environment:
-      - ROS_MASTER_URI=http://192.168.2.1:11311/
-      - ROS_HOSTNAME=192.168.2.148
-      - ROS_DISTRO=noetic
-    extra_hosts:
-      - "barracuda-orin:192.168.2.1"
+    # environment:
+    #   - ROS_MASTER_URI=http://192.168.2.1:11311/
+    #   - ROS_HOSTNAME=192.168.2.148
+    #   - ROS_DISTRO=noetic
+    # extra_hosts:
+    #   - "barracuda-orin:192.168.2.1"
     
     
