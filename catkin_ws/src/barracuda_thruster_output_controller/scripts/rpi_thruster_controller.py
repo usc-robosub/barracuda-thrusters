@@ -103,7 +103,8 @@ def on_recv_killswitch(msg):
 
     
 def on_recv_thruster_force(msg, thruster_id):
-    pwm_us = converter.to_us(msg.data)
+    negative_force = -1 * msg.data
+    pwm_us = converter.to_us(negative_force)
     # pwm_us / pwm_period = pwm_us * pwm_frequency
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
     # dividing by 10^3 twice to keep intermediate values smaller
