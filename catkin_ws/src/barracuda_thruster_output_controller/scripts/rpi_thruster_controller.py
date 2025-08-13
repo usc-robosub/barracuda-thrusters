@@ -64,7 +64,6 @@ from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 from collections import namedtuple
 import RPi.GPIO as GPIO
 
-
 # TODO: set up thrust config in config dir/use parameters 
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
 thruster_organization = {
@@ -75,7 +74,7 @@ thruster_organization = {
     4: ThrusterConfig(0x2e, 0),
     5: ThrusterConfig(0x2e, 2),
     6: ThrusterConfig(0x2e, 4),
-    7: ThrusterConfig(0x2e, 6),
+    7: ThrusterConfig(0x2e, 6)
 }
 
 TMP_KILLSWITCH_PIN = 22
