@@ -14,7 +14,7 @@ COPY catkin_ws /opt/barracuda-thruster-output-controller/catkin_ws
 COPY entrypoint.sh /opt/barracuda-thruster-output-controller/entrypoint.sh
 
 RUN chmod +x /opt/barracuda-thruster-output-controller/entrypoint.sh \
-    && chmod +x /opt/barracuda-thruster-output-controller/catkin_ws/src/barracuda_thruster_output_controller/scripts/F2PWM.py \
+    # && chmod +x /opt/barracuda-thruster-output-controller/catkin_ws/src/barracuda_thruster_output_controller/scripts/F2PWM.py \
     && chmod +x /opt/barracuda-thruster-output-controller/catkin_ws/src/barracuda_thruster_output_controller/scripts/rpi_thruster_controller.py \
     && source /opt/ros/noetic/setup.bash && echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc \
     && echo "[ -f /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash ] && source /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash" >> /root/.bashrc \ 
