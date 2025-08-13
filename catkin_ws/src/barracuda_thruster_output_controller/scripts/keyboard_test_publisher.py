@@ -85,7 +85,7 @@ def keyboard_test_publisher_node():
         topic = f"thrusters/{i}/input"
         pub = rospy.Publisher(topic, FloatStamped, queue_size=10)
         publishers.append(pub)
-    sw_killswitch_pub = rospy.Publisher("/killswitch", FloatStamped, queue_size=10)
+    sw_killswitch_pub = rospy.Publisher("killswitch", FloatStamped, queue_size=10)
     rate = rospy.Rate(20)
 
     while not rospy.is_shutdown():
