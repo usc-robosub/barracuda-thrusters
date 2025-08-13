@@ -112,6 +112,7 @@ def on_recv_thruster_force(msg, thruster_id):
     send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
 
 def shutdown_callback():
+    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW)
     GPIO.cleanup()
     
 def thruster_controller_node():

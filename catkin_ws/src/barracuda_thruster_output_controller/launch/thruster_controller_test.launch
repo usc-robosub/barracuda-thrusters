@@ -5,6 +5,7 @@
           type="keyboard_test_publisher.py" 
           name="thruster_test_publisher" 
           output="screen">
+        <env name="PYTHONPATH" value="$(find barracuda_thruster_output_controller)/third_party/sshkeyboard/src:$(optenv PYTHONPATH)" />
     </node>
     
 </launch>
