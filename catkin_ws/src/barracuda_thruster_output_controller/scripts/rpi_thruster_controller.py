@@ -117,7 +117,12 @@ def shutdown_callback():
     GPIO.cleanup()
     print("GPIO cleaned up")
     
-def thruster_controller_node():
+def thruster_controller_node(): 
+    GPIO.setmode(GPIO.BCM)
+
+    # TODO: change this to GPIO.setup
+    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
+    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
     
     rospy.init_node('barracuda_thruster_output_controller')
     rospy.on_shutdown(shutdown_callback)
@@ -148,11 +153,6 @@ def send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id):
 
 
 if __name__ == '__main__':
-    GPIO.setmode(GPIO.BCM)
-
-    # TODO: change this to GPIO.setup
-    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
-    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
     
     try:
         thruster_controller_node()
