@@ -115,6 +115,7 @@ def on_recv_thruster_force(msg, thruster_id):
 
 def shutdown_callback():
     GPIO.cleanup()
+    print("GPIO cleaned up")
     
 def thruster_controller_node():
     
@@ -150,4 +151,8 @@ if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
     GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
-    thruster_controller_node()
+    try:
+        thruster_controller_node()
+    finally:
+        GPIO.cleanup()
+
