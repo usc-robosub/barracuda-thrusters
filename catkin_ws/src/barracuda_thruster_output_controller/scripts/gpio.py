@@ -12,16 +12,16 @@ def gpio_node():
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(KILLSWITCH_STATUS_INPUT_PIN, GPIO.IN)
         GPIO.setup(LED_OUTPUT_PIN, GPIO.OUT)
-        rospy.wait_for_service('reinit_thrusters')
-        print('got service')
-        reinit_thrusters = rospy.ServiceProxy('reinit_thrusters', ReinitThrusters)
+        # rospy.wait_for_service('reinit_thrusters')
+        # print('got service')
+        # reinit_thrusters = rospy.ServiceProxy('reinit_thrusters', ReinitThrusters)
         # GPIO.add_event_detect(KILLSWITCH_STATUS_INPUT_PIN, GPIO.FALLING, callback=dummy_callback)
         
         rospy.init_node('gpio')
         rospy.on_shutdown(shutdown_callback)
 
         # input('input to test reinit\n')
-        reinit_thrusters()
+        # reinit_thrusters()
 
 
         rate = rospy.Rate(100)  # 100 Hz = 10ms polling

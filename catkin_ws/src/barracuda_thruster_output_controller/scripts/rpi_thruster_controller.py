@@ -116,7 +116,7 @@ def on_recv_thruster_force(msg, thruster_id):
 def thruster_controller_node(): 
     
     rospy.init_node('barracuda_thruster_output_controller')
-    s = rospy.Service('reinit_thrusters', ReinitThrusters, reinit_thrusters)
+    # s = rospy.Service('reinit_thrusters', ReinitThrusters, reinit_thrusters)
 
     # Create subscribers for each thruster
     try:
