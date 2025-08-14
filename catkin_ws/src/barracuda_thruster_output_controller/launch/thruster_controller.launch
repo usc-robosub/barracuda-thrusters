@@ -9,7 +9,7 @@
 
     <node pkg="barracuda_thruster_output_controller" 
           type="gpio.py" 
-          name="gpio" 
+          name="gpio"
           output="screen" ns="barracuda">
     </node>
     
