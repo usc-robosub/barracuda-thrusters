@@ -99,6 +99,7 @@ def to_duty_cycle_val(pwm_width_us):
 def reinit_thrusters(req):
     for thruster_idx in range(len(thruster_organization)):
         send_duty_cycle_val_to_thruster(to_duty_cycle_val(STOPPED_PWM_WIDTH), thruster_idx)
+    print("reinitted thrusters")
 
  
 def on_recv_thruster_force(msg, thruster_id):
