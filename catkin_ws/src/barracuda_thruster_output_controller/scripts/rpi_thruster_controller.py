@@ -80,6 +80,7 @@ thruster_organization = {
 }
 
 TMP_KILLSWITCH_PIN = 22
+THRUSTER_REINIT_PIN = -1
 
 # thruster_data_handler = ThrusterDataHandler()
 converter = F2PWM('t200_18v_data.csv', 'interpolation mode placeholder')
@@ -129,6 +130,7 @@ def thruster_controller_node():
     # TODO: change this to GPIO.setup
     GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
     GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
+    GPIO.add_event_detect(THRUSTER_REINIT_PIN, GPIO.FALLING, callback=reinit_thrusters)
     
     rospy.init_node('barracuda_thruster_output_controller')
     rospy.on_shutdown(shutdown_callback)
