@@ -94,25 +94,26 @@ except Exception as err:
 pwm_frequency = 333 # 
 pwm_bit_resolution = 8 
 
+def to_duty_cycle_val(pwm_width_us):
+    return int(round(((pwm_width_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
+
 def on_recv_killswitch(msg):
     if msg.data == 0:
         # print("should kill now")
         GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW) 
     # if msg.data == 1: 
     #     GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
-
-    
+ 
 def on_recv_thruster_force(msg, thruster_id):
     negative_force = -1 * msg.data
-    pwm_us = converter.to_us(negative_force)
+    pwm_width_us = converter.to_us(negative_force)
     # pwm_us / pwm_period = pwm_us * pwm_frequency
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
     # dividing by 10^3 twice to keep intermediate values smaller
-    duty_cycle_val = int(round(((pwm_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
 
     # if thruster_id == 0:
         # print(f'sending duty cycle val {duty_cycle_val} to thruster 0')
-    send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id)
+    send_duty_cycle_val_to_thruster(to_duty_cycle_val(pwm_width_us), thruster_id)
 
 def shutdown_callback():
     GPIO.cleanup()
