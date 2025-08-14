@@ -1,7 +1,8 @@
 import rospy
 import RPi.GPIO as GPIO
-from barracuda_thruster_output_controller.srv import ReinitThrusters
+# from barracuda_thruster_output_controller.srv import ReinitThrusters
 from geometry_msgs.msg import Wrench
+from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
 
 
 KILLSWITCH_STATUS_INPUT_PIN = 8 # Right side 12 down
@@ -20,6 +21,12 @@ def gpio_node():
         rospy.init_node('gpio')
         rospy.on_shutdown(shutdown_callback)
 
+        publishers = []
+        for i in range(8):
+            topic = f"thrusters/{i}/input"
+            pub = rospy.Publisher(topic, FloatStamped, queue_size=10)
+            publishers.append(pub)
+
         # input('input to test reinit\n')
         # reinit_thrusters()
 
@@ -32,7 +39,12 @@ def gpio_node():
             print(cur_killswitch_status)
             if prev_killswitch_status == False and cur_killswitch_status == True:
                 print("HI-->LO EDGE\n")
-                reinit_thrusters()
+                
+                for i in range(8):
+                    msg = FloatStamped()
+                    msg.header.stamp = rospy.Time.now()
+                    msg.data = 0
+                    publishers[i].publish(msg)
                 # Publish target pose (or target wrench)
                 # pub = rospy.Publisher("thruster_manager/input", Wrench, queue_size=10)
                 # wrench_msg = Wrench()

@@ -96,10 +96,10 @@ pwm_bit_resolution = 8
 def to_duty_cycle_val(pwm_width_us):
     return int(round(((pwm_width_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
 
-def reinit_thrusters(req):
-    for thruster_idx in range(len(thruster_organization)):
-        send_duty_cycle_val_to_thruster(to_duty_cycle_val(STOPPED_PWM_WIDTH), thruster_idx)
-    print("reinitted thrusters")
+# def reinit_thrusters(req):
+#     for thruster_idx in range(len(thruster_organization)):
+#         send_duty_cycle_val_to_thruster(to_duty_cycle_val(STOPPED_PWM_WIDTH), thruster_idx)
+#     print("reinitted thrusters")
 
  
 def on_recv_thruster_force(msg, thruster_id):
@@ -119,6 +119,7 @@ def thruster_controller_node():
     # s = rospy.Service('reinit_thrusters', ReinitThrusters, reinit_thrusters)
 
     # Create subscribers for each thruster
+
     try:
         for i in range(8):
             topic = f"thrusters/{i}/input"
