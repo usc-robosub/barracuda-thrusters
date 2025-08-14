@@ -6,7 +6,7 @@ services:
     user: root
     privileged: true
     image: barracuda-thruster-output-controller
-    container_name: thruster-controller
+    container_name: barracuda-thruster-output-controller
     tty: true
     network_mode: host
     restart: "always"
