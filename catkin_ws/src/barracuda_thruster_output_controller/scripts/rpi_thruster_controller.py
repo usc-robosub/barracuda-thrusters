@@ -97,6 +97,10 @@ pwm_bit_resolution = 8
 def to_duty_cycle_val(pwm_width_us):
     return int(round(((pwm_width_us / 10**3) * (pwm_frequency / 10**3)) * (2**pwm_bit_resolution)))
 
+def reinit_thrusters():
+    for thruster_idx in len(thruster_organization):
+        send_duty_cycle_val_to_thruster(to_duty_cycle_val(STOPPED_PWM_WIDTH), thruster_idx)
+
 def on_recv_killswitch(msg):
     if msg.data == 0:
         # print("should kill now")
