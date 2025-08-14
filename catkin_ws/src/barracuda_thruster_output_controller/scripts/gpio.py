@@ -27,8 +27,9 @@ def gpio_node():
         rate = rospy.Rate(100)  # 100 Hz = 10ms polling
         prev_killswitch_status = GPIO.input(KILLSWITCH_STATUS_INPUT_PIN)
         while not rospy.is_shutdown():
-            GPIO.output(LED_OUTPUT_PIN, GPIO.input(KILLSWITCH_STATUS_INPUT_PIN))
+            # GPIO.output(LED_OUTPUT_PIN, GPIO.input(KILLSWITCH_STATUS_INPUT_PIN))
             cur_killswitch_status = GPIO.input(KILLSWITCH_STATUS_INPUT_PIN)
+            print(cur_killswitch_status)
             if prev_killswitch_status == False and cur_killswitch_status == True:
                 print("HI-->LO EDGE\n")
                 reinit_thrusters()
