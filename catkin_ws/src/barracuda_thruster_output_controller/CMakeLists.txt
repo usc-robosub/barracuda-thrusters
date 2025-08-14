@@ -50,13 +50,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   FloatStamped.msg
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-# )
+add_service_files(
+  FILES
+  ReinitThrusters.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -162,7 +162,8 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/rpi_thruster_controller.py
   scripts/keyboard_test_publisher.py
-  scripts/F2PWM.py
+  scripts/gpio.py
+  # scripts/F2PWM.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

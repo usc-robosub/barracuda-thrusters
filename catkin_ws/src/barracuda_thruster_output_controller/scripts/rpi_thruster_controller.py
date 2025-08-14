@@ -61,10 +61,9 @@ from smbus import *
 import struct
 import rospy
 from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
+from barracuda_thruster_output_controller.srv import ReinitThrusters
 # from F2PWM import F2PWM
 from collections import namedtuple
-import RPi.GPIO as GPIO
-
 
 # TODO: set up thrust config in config dir/use parameters 
 ThrusterConfig = namedtuple('ThrusterConfig', ['i2c_address', 'register'])
@@ -79,8 +78,7 @@ thruster_organization = {
     7: ThrusterConfig(0x2e, 6)
 }
 
-TMP_KILLSWITCH_PIN = 22
-THRUSTER_REINIT_PIN = -1
+
 
 # thruster_data_handler = ThrusterDataHandler()
 converter = F2PWM('t200_18v_data.csv', 'interpolation mode placeholder')
@@ -102,12 +100,6 @@ def reinit_thrusters():
     for thruster_idx in len(thruster_organization):
         send_duty_cycle_val_to_thruster(to_duty_cycle_val(STOPPED_PWM_WIDTH), thruster_idx)
 
-def on_recv_killswitch(msg):
-    if msg.data == 0:
-        # print("should kill now")
-        GPIO.output(TMP_KILLSWITCH_PIN, GPIO.LOW) 
-    # if msg.data == 1: 
-    #     GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
  
 def on_recv_thruster_force(msg, thruster_id):
     negative_force = -1 * msg.data
@@ -119,27 +111,17 @@ def on_recv_thruster_force(msg, thruster_id):
     # if thruster_id == 0:
         # print(f'sending duty cycle val {duty_cycle_val} to thruster 0')
     send_duty_cycle_val_to_thruster(to_duty_cycle_val(pwm_width_us), thruster_id)
-
-def shutdown_callback():
-    GPIO.cleanup()
-    print("GPIO cleaned up")
     
 def thruster_controller_node(): 
-    GPIO.setmode(GPIO.BCM)
-
-    # TODO: change this to GPIO.setup
-    GPIO.setup(TMP_KILLSWITCH_PIN, GPIO.OUT)
-    GPIO.output(TMP_KILLSWITCH_PIN, GPIO.HIGH)
-    GPIO.add_event_detect(THRUSTER_REINIT_PIN, GPIO.FALLING, callback=reinit_thrusters)
     
     rospy.init_node('barracuda_thruster_output_controller')
-    rospy.on_shutdown(shutdown_callback)
+    s = rospy.Service('reinit_thrusters', ReinitThrusters, reinit_thrusters)
+
     # Create subscribers for each thruster
     try:
         for i in range(8):
             topic = f"thrusters/{i}/input"
             rospy.Subscriber(topic, FloatStamped, on_recv_thruster_force, callback_args=i)
-        rospy.Subscriber("killswitch", FloatStamped, on_recv_killswitch)   
     except Exception as e:
         print(e)
     
@@ -161,9 +143,5 @@ def send_duty_cycle_val_to_thruster(duty_cycle_val, thruster_id):
 
 
 if __name__ == '__main__':
-    
-    try:
-        thruster_controller_node()
-    finally:
-        GPIO.cleanup()
+    thruster_controller_node()
 
