@@ -87,6 +87,12 @@ def keyboard_test_publisher_node():
         publishers.append(pub)
     rate = rospy.Rate(20)
 
+    for i in THRUSTER_INDICES:
+        msg = FloatStamped()
+        msg.header.stamp = rospy.Time.now()
+        msg.data = 0
+        publishers[i - THRUSTER_INDICES[0]].publish(msg)
+
     while not rospy.is_shutdown():
         for i in THRUSTER_INDICES:
             msg = FloatStamped()
