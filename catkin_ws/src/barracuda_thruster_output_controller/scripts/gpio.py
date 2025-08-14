@@ -3,6 +3,7 @@ import RPi.GPIO as GPIO
 # from barracuda_thruster_output_controller.srv import ReinitThrusters
 from geometry_msgs.msg import Wrench
 from uuv_gazebo_ros_plugins_msgs.msg import FloatStamped
+import time
 
 
 KILLSWITCH_STATUS_INPUT_PIN = 8 # Right side 12 down
@@ -36,7 +37,7 @@ def gpio_node():
         while not rospy.is_shutdown():
             # GPIO.output(LED_OUTPUT_PIN, GPIO.input(KILLSWITCH_STATUS_INPUT_PIN))
             cur_killswitch_status = GPIO.input(KILLSWITCH_STATUS_INPUT_PIN)
-            print(cur_killswitch_status)
+            # print(cur_killswitch_status)
             if prev_killswitch_status == False and cur_killswitch_status == True:
                 print("HI-->LO EDGE\n")
                 
@@ -45,18 +46,29 @@ def gpio_node():
                     msg.header.stamp = rospy.Time.now()
                     msg.data = 0
                     publishers[i].publish(msg)
-                # Publish target pose (or target wrench)
-                # pub = rospy.Publisher("thruster_manager/input", Wrench, queue_size=10)
-                # wrench_msg = Wrench()
+                # Publish target wrench
+                pub = rospy.Publisher("thruster_manager/input", Wrench, queue_size=10)
+                wrench_msg = Wrench()
 
-                # wrench_msg.force.x = 10.0 
-                # wrench_msg.force.y = 0.0
-                # wrench_msg.force.z = -2.0
+                wrench_msg.force.x = 10.0 
+                wrench_msg.force.y = 0.0
+                wrench_msg.force.z = -2.0
 
-                # wrench_msg.torque.x = 0.0  
-                # wrench_msg.torque.y = 0.0
-                # wrench_msg.torque.z = 0.0
-                # pub.publish(wrench_msg)
+                wrench_msg.torque.x = 0.0  
+                wrench_msg.torque.y = 0.0
+                wrench_msg.torque.z = 0.0
+                pub.publish(wrench_msg)
+
+                time.sleep(8)
+
+                # stop thrusters
+                for i in range(8):
+                    msg = FloatStamped()
+                    msg.header.stamp = rospy.Time.now()
+                    msg.data = 0
+                    publishers[i].publish(msg)
+
+                
 
             prev_killswitch_status = cur_killswitch_status
             rate.sleep()
