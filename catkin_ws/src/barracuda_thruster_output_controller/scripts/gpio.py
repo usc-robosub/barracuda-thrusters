@@ -20,7 +20,7 @@ def gpio_node():
         rospy.init_node('gpio')
         rospy.on_shutdown(shutdown_callback)
 
-        input('input to test reinit\n')
+        # input('input to test reinit\n')
         reinit_thrusters()
 
 
