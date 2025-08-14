@@ -6,5 +6,11 @@
           output="screen" ns="barracuda">
           <env name="PYTHONPATH" value="$(find barracuda_thruster_output_controller)/scripts:$(optenv PYTHONPATH)" />
     </node>
+
+    <node pkg="barracuda_thruster_output_controller" 
+          type="gpio.py" 
+          name="gpio" 
+          output="screen" ns="barracuda">
+    </node>
     
 </launch>
