@@ -1,27 +1,28 @@
 services:
-  barracuda-thruster-output-controller:
+ barracuda-thrusters: 
     build:
       context: .
       dockerfile: Dockerfile
     user: root
     privileged: true
-    image: barracuda-thruster-output-controller
-    container_name: thruster-controller
+    image: barracuda-thrusters
+    # container_name: barracuda-thrusters
     tty: true
     network_mode: host
     restart: "always"
     volumes:
       # - $HOME/.gitconfig:/root/.gitconfig:ro
       # - $HOME/.ssh:/root/.ssh
-      - $PWD/catkin_ws/src:/opt/barracuda-thruster-output-controller/catkin_ws/src
-    devices:
-      - /dev/i2c-1:/dev/i2c-1
-      - /dev/gpiomem:/dev/gpiomem
-    environment:
-      - ROS_MASTER_URI=http://192.168.2.1:11311/
-      - ROS_HOSTNAME=192.168.2.148
+      # - $PWD/catkin_ws/src:/opt/barracuda-thruster-output-controller/catkin_ws/src
+      - $PWD/dev_ws/src:/opt/barracuda-thrusters/dev_ws/src
+#    devices:
+#      - /dev/i2c-1:/dev/i2c-1
+#      - /dev/gpiomem:/dev/gpiomem
+#    environment:
+#      - ROS_MASTER_URI=http://192.168.2.1:11311/
+#      - ROS_HOSTNAME=192.168.2.148
     #   - ROS_DISTRO=noetic
-    extra_hosts:
-      - "barracuda-orin:192.168.2.1"
+#    extra_hosts:
+#      - "barracuda-orin:192.168.2.1"
     
     
