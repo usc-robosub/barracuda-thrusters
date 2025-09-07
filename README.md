@@ -1,4 +1,4 @@
-# barracuda-thruster-output-controller
+# barracuda-thrusters
 
 ### Setup Instructions
 1. Clone the repo to an RPi (tested on RPi running 64-bit Bookworm). See [RPi Setup Instructions](#rpi-setup-instructions) to make sure it is set up properly.
