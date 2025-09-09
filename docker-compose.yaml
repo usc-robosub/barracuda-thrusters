@@ -11,9 +11,6 @@ services:
     network_mode: host
     restart: "always"
     volumes:
-      # - $HOME/.gitconfig:/root/.gitconfig:ro
-      # - $HOME/.ssh:/root/.ssh
-      # - $PWD/catkin_ws/src:/opt/barracuda-thruster-output-controller/catkin_ws/src
       - $PWD/dev_ws/src:/opt/barracuda-thrusters/dev_ws/src
 #    devices:
 #      - /dev/i2c-1:/dev/i2c-1
@@ -21,7 +18,7 @@ services:
 #    environment:
 #      - ROS_MASTER_URI=http://192.168.2.1:11311/
 #      - ROS_HOSTNAME=192.168.2.148
-    #   - ROS_DISTRO=noetic
+#      - ROS_DISTRO=noetic
 #    extra_hosts:
 #      - "barracuda-orin:192.168.2.1"
     
