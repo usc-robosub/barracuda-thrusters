@@ -20,8 +20,8 @@ class BarracudaThrusters(Node):
     
     # self.converter = F2PWM('t200_18v_data.csv')
 
-  def on_recv_force(self, msg, thruster_idx):
-    self.
+  # def on_recv_force(self, msg, thruster_idx):
+  #   self.
 def main():
     print('Hi from barracuda_thrusters.')
 
