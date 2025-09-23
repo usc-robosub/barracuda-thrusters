@@ -1,25 +1,35 @@
 services:
- barracuda-thrusters: 
+  dev:
+    extends: barracuda-thrusters
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh
+      - ${HOME}/.gitconfig:/root/.gitconfig
+      - ${HOME}/.vimrc:/root/.vimrc
+      - ${PWD}/${BASE_IMAGE}:/opt/${BASE_IMAGE}
+
+  barracuda-thrusters: 
+    extends:
+      barracuda-thrusters-no-serial
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
+  
+  dev-no-serial:
+    extends: barracuda-thrusters-no-serial
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh
+      - ${HOME}/.gitconfig:/root/.gitconfig
+      - ${HOME}/.vimrc:/root/.vimrc
+      - ${PWD}/${BASE_IMAGE}:/opt/${BASE_IMAGE}
+
+  barracuda-thrusters-no-serial:
     build:
       context: .
       dockerfile: Dockerfile
     user: root
-    privileged: true
+    # privileged: true
     image: barracuda-thrusters
-    # container_name: barracuda-thrusters
     tty: true
     network_mode: host
     restart: "always"
-    volumes:
-      - $PWD/dev_ws/src:/opt/barracuda-thrusters/dev_ws/src
-#    devices:
-#      - /dev/i2c-1:/dev/i2c-1
-#      - /dev/gpiomem:/dev/gpiomem
-#    environment:
-#      - ROS_MASTER_URI=http://192.168.2.1:11311/
-#      - ROS_HOSTNAME=192.168.2.148
-#      - ROS_DISTRO=noetic
-#    extra_hosts:
-#      - "barracuda-orin:192.168.2.1"
     
     

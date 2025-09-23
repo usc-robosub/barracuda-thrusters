@@ -13,9 +13,9 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='root',
-    maintainer_email='root@todo.todo',
-    description='TODO: Package description',
+    maintainer='mihir',
+    maintainer_email='mihirsin@usc.edu',
+    description='barracuda_thrusters package converts desired force values for each thruster (which it receives from the control module) into values that can be output on the PWM pins on the microcontrollers on the thruster boards, then sends the appropriate values to the appropriate registers on the microcontrollers via serial',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
