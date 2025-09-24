@@ -11,7 +11,7 @@ class BarracudaThrusters(Node):
     def __init__(self):
         super().__init__('barracuda_thrusters')
 
-        self.n_thrusters = 8
+        self.n_thrusters = 4
 
         self.f2pwm = F2PWM()
         self.serial_sender = SerialSender(self.n_thrusters)
@@ -27,7 +27,7 @@ class BarracudaThrusters(Node):
            
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
-        pwm_duty_cycle_val = self.f2pwm.convert(thruster_force_newtons)
+        pwm_duty_cycle_val = self.f2pwm.to_us(thruster_force_newtons)
         self.serial_sender.send(pwm_duty_cycle_val, thruster_idx)
 
 

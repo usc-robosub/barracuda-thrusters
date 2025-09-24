@@ -21,7 +21,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'barracuda_thrusters = barracuda_thrusters.barracuda_thrusters:main'
+            'barracuda_thrusters = barracuda_thrusters.barracuda_thrusters:main',
+            'test_publisher = barracuda_thrusters.test_publisher:main',
         ],
     },
 )
