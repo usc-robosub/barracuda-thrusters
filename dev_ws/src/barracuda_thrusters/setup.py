@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'thruster_controller = barracuda_thrusters.thruster_controller:main'
+            'barracuda_thrusters = barracuda_thrusters.barracuda_thrusters:main'
         ],
     },
 )
