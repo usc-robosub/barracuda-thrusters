@@ -25,10 +25,10 @@ class SerialSender:
             1: SerialSender.ThrusterLoc(0x2D, 2),
             2: SerialSender.ThrusterLoc(0x2D, 4),
             3: SerialSender.ThrusterLoc(0x2D, 6),
-            # 4: SerialSender.ThrusterLoc(0x2E, 0),
-            # 5: SerialSender.ThrusterLoc(0x2E, 2),
-            # 6: SerialSender.ThrusterLoc(0x2E, 4),
-            # 7: SerialSender.ThrusterLoc(0x2E, 6),
+            4: SerialSender.ThrusterLoc(0x2E, 0),
+            5: SerialSender.ThrusterLoc(0x2E, 2),
+            6: SerialSender.ThrusterLoc(0x2E, 4),
+            7: SerialSender.ThrusterLoc(0x2E, 6),
         }
         assert n_thrusters == len(self.thrusters), 'n_thrusters must equal length of the thruster organization dict'
     

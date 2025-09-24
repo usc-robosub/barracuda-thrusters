@@ -11,7 +11,8 @@ class BarracudaThrusters(Node):
     def __init__(self):
         super().__init__('barracuda_thrusters')
 
-        self.n_thrusters = 4
+        self.declare_parameter('n_thrusters', 8)
+        self.n_thrusters = self.get_parameter('n_thrusters').value
 
         self.f2pwm = F2PWM()
         self.serial_sender = SerialSender(self.n_thrusters)
