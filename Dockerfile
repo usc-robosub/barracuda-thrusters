@@ -16,7 +16,7 @@ RUN . /opt/ros/jazzy/setup.sh && \
   colcon build --symlink-install
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc \
-  && echo "[ -f /opt/ros2tut/dev_ws/install/setup.bash ] && source /opt/ros2tut/dev_ws/install/setup.bash" >> ~/.bashrc \
+  && echo "[ -f /opt/barracuda-thrusters/dev_ws/install/setup.bash ] && source /opt/barracuda-thrusters/dev_ws/install/setup.bash" >> ~/.bashrc \
   && sed -i '1iforce_color_prompt=yes' ~/.bashrc
 
 WORKDIR /opt/barracuda-thrusters/dev_ws
