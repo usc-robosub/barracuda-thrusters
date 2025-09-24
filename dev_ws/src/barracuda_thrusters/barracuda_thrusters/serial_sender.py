@@ -1,3 +1,4 @@
+from rclpy.logging import get_logger
 from smbus import *
 import struct
 from collections import namedtuple
@@ -6,6 +7,8 @@ class SerialSender:
     ThrusterLoc = namedtuple("ThrusterLoc", ["i2c_address", "register"])
 
     def __init__(self, n_thrusters):
+        self.logger = get_logger('SerialSender')
+        
         self.serial_enabled = True
         try:
             import RPi.GPIO as GPIO
@@ -33,7 +36,8 @@ class SerialSender:
         assert n_thrusters == len(self.thrusters), 'n_thrusters must equal length of the thruster organization dict'
     
     def send(self, pwm_duty_cycle_val, thruster_idx):
-        print(f'sending {pwm_duty_cycle_val} to thruster {thruster_idx}')
+        # print(f'sending {pwm_duty_cycle_val} to thruster {thruster_idx}')
+        self.logger.info(f'sending {pwm_duty_cycle_val} to thruster {thruster_idx}')
         if not self.serial_enabled:
             return
 

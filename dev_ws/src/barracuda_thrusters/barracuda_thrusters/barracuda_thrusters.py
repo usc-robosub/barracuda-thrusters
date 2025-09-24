@@ -31,7 +31,6 @@ class BarracudaThrusters(Node):
         pwm_duty_cycle_val = self.f2pwm.to_us(thruster_force_newtons)
         self.serial_sender.send(pwm_duty_cycle_val, thruster_idx)
 
-
 def main():
     rclpy.init()
 

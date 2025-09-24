@@ -22,7 +22,7 @@ class MinimalPublisher(Node):
             msg.data = 23.56
             # self.publisher_.publish(msg)
             self.pubs[idx].publish(msg)
-            self.get_logger().info(f'Publishing: {msg.data} for thruster {idx}')
+            # self.get_logger().info(f'Publishing: {msg.data} for thruster {idx}')
         self.i += 1
 
 
