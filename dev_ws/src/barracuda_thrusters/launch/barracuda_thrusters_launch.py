@@ -10,9 +10,6 @@ def generate_launch_description():
             parameters=[{
                 'n_thrusters': 8
             }],
-            remappings=[
-                ('/scan', '/scan_1')
-            ]
         ),
         Node(
             package='barracuda_thrusters',
