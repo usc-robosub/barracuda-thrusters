@@ -1,6 +1,7 @@
 import csv
 import os
 from bisect import bisect_left
+from ament_index_python.packages import get_package_share_directory
 
 NEWTONS_PER_KGF = 9.80665
 STOPPED_PWM_WIDTH = 1500
@@ -9,7 +10,11 @@ class F2PWM:
     def __init__(self, csv_filename='t200_18v_data.csv'):
         self.pwm_widths = []
         self.force_vals = []
-        self._create_lut_lists(csv_filename)
+
+        package_share_dir = get_package_share_directory('barracuda_thrusters')
+        csv_path = os.path.join(package_share_dir, csv_filename)
+
+        self._create_lut_lists(csv_path)
     
     # convert force (newtons) to PWM width (microseconds)
     def to_us(self, force_newtons):
@@ -40,4 +45,4 @@ class F2PWM:
                 pwm_width, force_newtons = int(row['PWM (µs)']), float(row['Force (N)'])
                 self.pwm_widths.append(pwm_width)
                 self.force_vals.append(force_newtons)
-                print(pwm_width, force_newtons)
+                # print(pwm_width, force_newtons)

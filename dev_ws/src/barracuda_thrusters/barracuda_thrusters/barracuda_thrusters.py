@@ -1,15 +1,15 @@
 import rclpy
 from rclpy.node import Node
 
-from f2pwm import F2PWM
-from serial_sender import SerialSender
+from .f2pwm import F2PWM
+from .serial_sender import SerialSender
 
 from std_msgs.msg import Float32
 
 class BarracudaThrusters(Node):
 
     def __init__(self):
-        super().__init('barracuda_thrusters')
+        super().__init__('barracuda_thrusters')
 
         self.n_thrusters = 8
 
@@ -17,9 +17,9 @@ class BarracudaThrusters(Node):
         self.serial_sender = SerialSender(self.n_thrusters)
 
         for thruster_idx in range(self.n_thrusters):
-            topic = f'thrusters/input{i}'
+            topic = f'thrusters/input{thruster_idx}'
             self.create_subscription(
-                Float, 
+                Float32, 
                 topic, 
                 lambda msg, thruster_idx=thruster_idx: self.subscriber_callback(msg, thruster_idx), 
                 10
@@ -32,6 +32,8 @@ class BarracudaThrusters(Node):
 
 
 def main():
+    rclpy.init()
+
     barracuda_thrusters = BarracudaThrusters()
 
     rclpy.spin(barracuda_thrusters)
