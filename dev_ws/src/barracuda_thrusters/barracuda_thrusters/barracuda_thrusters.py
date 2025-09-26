@@ -1,8 +1,8 @@
 import rclpy
 from rclpy.node import Node
 
-from .f2pwm import F2PWM
-from .serial_sender import SerialSender
+from . import f2pwm
+from . import serial
 
 from std_msgs.msg import Float32
 
@@ -13,9 +13,9 @@ class BarracudaThrusters(Node):
 
         self.declare_parameter('n_thrusters', 8)
         self.n_thrusters = self.get_parameter('n_thrusters').value
+        assert self.n_thrusters == len(serial.thruster_regs), 'n_thrusters must equal length of the thruster_reg dict'
 
-        self.f2pwm = F2PWM()
-        self.serial_sender = SerialSender(self.n_thrusters)
+        self.verify_config_values()
 
         for thruster_idx in range(self.n_thrusters):
             topic = f'thrusters/input{thruster_idx}'
@@ -25,11 +25,28 @@ class BarracudaThrusters(Node):
                 lambda msg, thruster_idx=thruster_idx: self.subscriber_callback(msg, thruster_idx), 
                 10
             )
-           
+
+    def verify_config_values(self):
+        teensy0_pwm_freq = serial.read_reg16(serial.pwm_freq_reg[serial.ADDR0])
+        teensy0_pwm_bit_res = serial.read_reg16(serial.pwm_bit_res_reg[serial.ADDR0])
+
+        teensy1_pwm_freq = serial.read_reg16(serial.pwm_freq_reg[serial.ADDR1])
+        teensy1_pwm_bit_res = serial.read_reg16(serial.pwm_bit_res_reg[serial.ADDR1])
+
+        assert (
+            teensy0_pwm_freq == teensy1_pwm_freq == f2pwm.PWM_FREQ,
+            'one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ'
+        )
+
+        assert (
+            teensy0_pwm_bit_res == teensy1_pwm_bit_res == f2pwm.PWM_BIT_RES,
+            'one or both of the teensy pwm bit res reg values are not equal to f2pwm.PWM_BIT_RES'
+        )
+
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
         pwm_duty_cycle_val = self.f2pwm.to_us(thruster_force_newtons)
-        self.serial_sender.send(pwm_duty_cycle_val, thruster_idx)
+        serial.write_reg16(serial.thruster_reg[thruster_idx], pwm_duty_cycle_val)
 
 def main():
     rclpy.init()
