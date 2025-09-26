@@ -34,12 +34,6 @@ pwm_bit_res_reg = {
     ADDR1: RegLoc(ADDR1, _PWM_BIT_RES_REG) 
 }
 
-def pwm_freq_reg(i2c_addr):
-    return RegLoc(i2c_addr, _PWM_FREQ_REG)
-
-def pwm_bit_res_reg(i2c_addr):
-    return RegLoc(i2c_addr, _PWM_BIT_RES_REG)
-
 def write_reg16(reg_loc: RegLoc, val):
     if GPIO is None or bus is None:
         logger.info(f'sending {val} to address {reg_loc.i2c_addr}, reg {reg_loc.reg}')
@@ -61,7 +55,7 @@ def write_reg16(reg_loc: RegLoc, val):
 def read_reg16(reg_loc: RegLoc):
     try:
         data = bus.read_i2c_block_data(reg_loc.i2c_addr, reg_loc.reg, 2)
-    except:
+    except Exception as e:
         print(f"Error writing to target: {e}")
         print(reg_loc.i2c_addr, reg_loc.reg)
         print("Check that the wiring is correct and you're using the correct pins.")
@@ -77,6 +71,6 @@ except Exception as e:
 
 try:
     bus = SMBus(1)
-except:
+except Exception as e:
     bus = None
     print(f'exception initializing i2c bus: {e}\nwill print instead of sending over serial')
