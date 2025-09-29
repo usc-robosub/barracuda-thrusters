@@ -36,7 +36,7 @@ pwm_bit_res_reg = {
 
 def write_reg16(reg_loc: RegLoc, val):
     if GPIO is None or bus is None:
-        logger.info(f'sending {val} to address {reg_loc.i2c_addr}, reg {reg_loc.reg}')
+        logger.info(f'sending {val} to address {reg_loc.i2c_addr:02x}, reg {reg_loc.reg}')
         return
     
     assert bus is not None, 'self.bus is None (it should not be if RPi.GPIO was imported)'
@@ -53,6 +53,9 @@ def write_reg16(reg_loc: RegLoc, val):
 
 
 def read_reg16(reg_loc: RegLoc):
+    if GPIO is None or bus is None:
+        logger.info(f'reading from address {reg_loc.i2c_addr:02x}, reg {reg_loc.reg}')
+        return None
     try:
         data = bus.read_i2c_block_data(reg_loc.i2c_addr, reg_loc.reg, 2)
     except Exception as e:
