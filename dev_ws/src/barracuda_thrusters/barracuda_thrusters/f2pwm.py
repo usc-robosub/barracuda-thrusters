@@ -54,7 +54,7 @@ def to_duty_cycle(force_newtons):
     # need to divide pwm_us * pwm_frequency by 10^6 to account for us/s difference, 
     # dividing by 10^3 twice to keep intermediate values smaller
     pwm_width_us = _to_us(force_newtons)
-    return int(round(((pwm_width_us / 10**3) * (PWM_CONFIG['FREQ'] / 10**3)) * (2**PWM_CONFIG['BIT_RES'])))
+    return int(round(((pwm_width_us / 10**3) * (PWM_FREQ / 10**3)) * (2**PWM_BIT_RES)))
 
 # create lut on module import
 _pwm_widths, _force_vals = _create_lut_lists()

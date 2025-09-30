@@ -41,8 +41,8 @@ class BarracudaThrusters(Node):
 
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
-        pwm_duty_cycle_val = self.f2pwm.to_us(thruster_force_newtons)
-        serial.write_reg16(serial.thruster_reg[thruster_idx], pwm_duty_cycle_val)
+        pwm_duty_cycle_val = f2pwm.to_duty_cycle(thruster_force_newtons)
+        serial.write_reg16(serial.thruster_regs[thruster_idx], pwm_duty_cycle_val)
 
 def main():
     rclpy.init()

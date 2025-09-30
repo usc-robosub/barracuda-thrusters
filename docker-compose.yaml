@@ -1,35 +1,36 @@
 services:
-  dev:
-    extends: barracuda-thrusters
-    volumes:
-      - ${HOME}/.ssh:/root/.ssh
-      - ${HOME}/.gitconfig:/root/.gitconfig
-      - ${HOME}/.vimrc:/root/.vimrc
-      - ${PWD}/${BASE_IMAGE}:/opt/${BASE_IMAGE}
-
   barracuda-thrusters: 
-    extends:
-      barracuda-thrusters-no-serial
-    devices:
-      - /dev/i2c-1:/dev/i2c-1
-  
-  dev-no-serial:
-    extends: barracuda-thrusters-no-serial
-    volumes:
-      - ${HOME}/.ssh:/root/.ssh
-      - ${HOME}/.gitconfig:/root/.gitconfig
-      - ${HOME}/.vimrc:/root/.vimrc
-      - ${PWD}/${BASE_IMAGE}:/opt/${BASE_IMAGE}
-
-  barracuda-thrusters-no-serial:
     build:
       context: .
       dockerfile: Dockerfile
     user: root
-    # privileged: true
+    privileged: true
     image: barracuda-thrusters
     tty: true
     network_mode: host
-    restart: "always"
-    
-    
+    ipc: host
+    # restart: "always"
+    # devices:
+    #   - /dev/i2c-1:/dev/i2c-1
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: root
+    privileged: true
+    image: barracuda-thrusters
+    tty: true
+    network_mode: host
+    ipc: host
+    # restart: "always"
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh
+      - ${HOME}/.gitconfig:/root/.gitconfig
+      - ${HOME}/.vimrc:/root/.vimrc
+      - ${PWD}:/opt/barracuda-thrusters
+    profiles: ["dev"]
+
