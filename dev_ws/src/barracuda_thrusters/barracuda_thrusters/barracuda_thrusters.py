@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 from . import f2pwm
-from . import serial
+from . import teensy
 
 from std_msgs.msg import Float32
 
@@ -13,7 +13,6 @@ class BarracudaThrusters(Node):
 
         self.declare_parameter('n_thrusters', 8)
         self.n_thrusters = self.get_parameter('n_thrusters').value
-        assert self.n_thrusters == len(serial.thruster_regs), 'n_thrusters must equal length of the thruster_reg dict'
 
         self.verify_config_values()
 
@@ -27,22 +26,25 @@ class BarracudaThrusters(Node):
             )
 
     def verify_config_values(self):
-        teensy0_pwm_freq = serial.read_reg16(serial.pwm_freq_reg[serial.ADDR0])
-        teensy0_pwm_bit_res = serial.read_reg16(serial.pwm_bit_res_reg[serial.ADDR0])
-
-        teensy1_pwm_freq = serial.read_reg16(serial.pwm_freq_reg[serial.ADDR1])
-        teensy1_pwm_bit_res = serial.read_reg16(serial.pwm_bit_res_reg[serial.ADDR1])
-        if not (teensy0_pwm_freq is None and teensy0_pwm_bit_res is None and teensy1_pwm_freq is None and teensy1_pwm_bit_res is None): 
-            pwm_config_assertion = 'one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ'
-            assert teensy0_pwm_freq == teensy1_pwm_freq == f2pwm.PWM_FREQ, pwm_config_assertion
-            # self.get_logger().error(pwm_config_assertion)
-            pwm_bit_res_assertion = 'one or both of the teensy pwm bit res reg values are not equal to f2pwm.PWM_BIT_RES'
-            assert teensy0_pwm_bit_res == teensy1_pwm_bit_res == f2pwm.PWM_BIT_RES, pwm_bit_res_assertion
+        for i2c_addr in teensy.i2c_addresses:
+            teensy_pwm_freq = teensy.read_i2c_16(i2c_addr, teensy.PWM_FREQ_REG)
+            teensy_pwm_bit_res = teensy.read_i2c_16(i2c_addr, teensy.PWM_BIT_RES_REG)
+            teensy_t200_init = teensy.read_i2c_16(i2c_addr, teensy.T200_INIT_REG)
+            if not (teensy_pwm_freq is None and teensy_pwm_bit_res is None and teensy_t200_init is None):
+                assert teensy_pwm_freq == f2pwm.PWM_FREQ, 'one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ'
+                assert teensy_pwm_bit_res == f2pwm.PWM_BIT_RES, 'one or both of the teensy pwm bit res reg values are not equal to f2pwm.PWM_BIT_RES' 
+                assert teensy_t200_init == f2pwm.T200_INIT, 'one or both of the teensy t200 init reg values are not equal to f2pwm.T200_INIT' 
 
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
         pwm_duty_cycle_val = f2pwm.to_duty_cycle(thruster_force_newtons)
-        serial.write_reg16(serial.thruster_regs[thruster_idx], pwm_duty_cycle_val)
+
+        # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
+        teensy.write_i2c_16(
+            teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)], 
+            teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
+            pwm_duty_cycle_val
+        )
 
 def main():
     rclpy.init()

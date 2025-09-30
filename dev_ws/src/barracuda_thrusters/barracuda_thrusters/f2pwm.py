@@ -9,8 +9,8 @@ from bisect import bisect_left
 from ament_index_python.packages import get_package_share_directory
 
 PWM_FREQ = 333
-PWM_BIT_RES = 8;
-T200_STOPPED_PWM_WIDTH_US = 1500
+PWM_BIT_RES = 8
+T200_INIT = 1500 # width of thruster init pulse in microseconds (also the pulse width to keep thrusters stopped)
 
 # creates lookup table implemented with two lists where pwm_widths[i] gives the pwm width in microseconds
 # required to output a force of force_vals[i] in Newtons 

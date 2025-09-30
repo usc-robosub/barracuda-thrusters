@@ -3,40 +3,19 @@ from smbus import SMBus
 import struct
 from collections import namedtuple
 
-logger = get_logger('Serial')
+logger = get_logger('Teensy')
 
-RegLoc = namedtuple('RegLoc', ['i2c_addr', 'reg'])
+i2c_addresses = [0x2d, 0x2e]
 
-ADDR0 = 0x2d
-ADDR1 = 0x2e
+PWM_FREQ_REG = 0
+PWM_BIT_RES_REG = 2
+T200_INIT_REG = 4
 
-_PWM_FREQ_REG = 8
-_PWM_BIT_RES_REG = 10
-
-thruster_regs = {
-    0: RegLoc(ADDR0, 0),
-    1: RegLoc(ADDR0, 2),
-    2: RegLoc(ADDR0, 4),
-    3: RegLoc(ADDR0, 6),
-    4: RegLoc(ADDR1, 0),
-    5: RegLoc(ADDR1, 2),
-    6: RegLoc(ADDR1, 4),
-    7: RegLoc(ADDR1, 6),
-}
-
-pwm_freq_reg = {
-    ADDR0: RegLoc(ADDR0, _PWM_FREQ_REG),
-    ADDR1: RegLoc(ADDR1, _PWM_FREQ_REG)
-}
-
-pwm_bit_res_reg = {
-    ADDR0: RegLoc(ADDR0, _PWM_BIT_RES_REG),
-    ADDR1: RegLoc(ADDR1, _PWM_BIT_RES_REG) 
-}
-
-def write_reg16(reg_loc: RegLoc, val):
+thruster_registers = [6, 8, 10, 12]
+    
+def write_i2c_16(addr, reg, val):
     if GPIO is None or bus is None:
-        logger.info(f'sending {val} to address {reg_loc.i2c_addr:02x}, reg {reg_loc.reg}')
+        logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
         return
     
     assert bus is not None, 'self.bus is None (it should not be if RPi.GPIO was imported)'
@@ -44,23 +23,23 @@ def write_reg16(reg_loc: RegLoc, val):
     # H is for unsigned short (16-bit)
     data = list(struct.pack('<H', val))
     try:
-        bus.write_i2c_block_data(reg_loc.i2c_addr, reg_loc.reg, data)
+        bus.write_i2c_block_data(addr, reg, data)
     except Exception as e:
         print(f"Error writing to target: {e}")
-        print(reg_loc.i2c_addr, reg_loc.reg)
+        print(addr, reg)
         print("Check that the wiring is correct and you're using the correct pins.")
         exit()
 
 
-def read_reg16(reg_loc: RegLoc):
+def read_i2c_16(addr, reg):
     if GPIO is None or bus is None:
-        logger.info(f'reading from address {reg_loc.i2c_addr:02x}, reg {reg_loc.reg}')
+        logger.info(f'reading from address {addr:02x}, reg {reg}')
         return None
     try:
-        data = bus.read_i2c_block_data(reg_loc.i2c_addr, reg_loc.reg, 2)
+        data = bus.read_i2c_block_data(addr, reg, 2)
     except Exception as e:
         print(f"Error writing to target: {e}")
-        print(reg_loc.i2c_addr, reg_loc.reg)
+        print(addr, reg)
         print("Check that the wiring is correct and you're using the correct pins.")
         exit()
     return data
