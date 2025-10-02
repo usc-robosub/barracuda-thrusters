@@ -7,11 +7,11 @@ logger = get_logger('Teensy')
 
 i2c_addresses = [0x2d, 0x2e]
 
-PWM_FREQ_REG = 0
-PWM_BIT_RES_REG = 2
-T200_INIT_REG = 4
+PWM_FREQ_REG = 8
+PWM_BIT_RES_REG = 10
+T200_INIT_REG = 12
 
-thruster_registers = [6, 8, 10, 12]
+thruster_registers = [0, 2, 4, 6]
     
 def write_i2c_16(addr, reg, val):
     logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
