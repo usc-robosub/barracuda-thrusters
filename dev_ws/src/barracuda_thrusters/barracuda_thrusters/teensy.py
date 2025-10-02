@@ -26,7 +26,7 @@ def write_i2c_16(addr, reg, val):
         bus.write_i2c_block_data(addr, reg, data)
     except Exception as e:
         print(f"Error writing to target: {e}")
-        print(addr, reg)
+        print(f"I2C write failed at addr {addr:#04x}, reg {reg}: {e}")
         print("Check that the wiring is correct and you're using the correct pins.")
         # exit()  <-- comment this out so node continues
 
@@ -38,10 +38,10 @@ def read_i2c_16(addr, reg):
     try:
         data = bus.read_i2c_block_data(addr, reg, 2)
     except Exception as e:
-        print(f"Error writing to target: {e}")
-        print(f"I2C write failed at addr {addr:#04x}, reg {reg}: {e}")
+        print(f"Error reading target: {e}")
+        print(f"I2C read failed at addr {addr:#04x}, reg {reg}: {e}")
         print("Check that the wiring is correct and you're using the correct pins.")
-        exit()
+        #exit()
     return data
 
 # run on module import
