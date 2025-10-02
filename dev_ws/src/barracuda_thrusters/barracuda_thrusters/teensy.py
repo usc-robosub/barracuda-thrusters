@@ -14,47 +14,40 @@ T200_INIT_REG = 12
 thruster_registers = [0, 2, 4, 6]
     
 def write_i2c_16(addr, reg, val):
-    logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
     if GPIO is None or bus is None:   
         return
     
-    assert bus is not None, 'self.bus is None (it should not be if RPi.GPIO was imported)'
+    logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
 
     # H is for unsigned short (16-bit)
     data = list(struct.pack('<H', val))
     try:
         bus.write_i2c_block_data(addr, reg, data)
     except Exception as e:
-        # print(f"Error writing to target: {e}")
-        # print(f"I2C write failed at addr {addr:#04x}, reg {reg}: {e}")
-        # print("Check that the wiring is correct and you're using the correct pins.")
         logger.error(f'I2C write failed at addr {addr:#04x}, reg {reg}: {e}')
-        # exit()  <-- comment this out so node continues
 
 
 def read_i2c_16(addr, reg):
     if GPIO is None or bus is None:
-        logger.info(f'reading from address {addr:02x}, reg {reg}')
         return None
+
+        logger.info(f'reading from address {addr:02x}, reg {reg}')
+
     try:
-        data = bus.read_i2c_block_data(addr, reg, 2)
+        return bus.read_i2c_block_data(addr, reg, 2)
     except Exception as e:
-        # print(f"Error reading target: {e}")
-        # print(f"I2C read failed at addr {addr:#04x}, reg {reg}: {e}")
-        logger.error(f'I2C write failed at addr {addr:#04x}, reg {reg}: {e}')
-        # print("Check that the wiring is correct and you're using the correct pins.")
-        #exit()
-    return data
+        logger.error(f'I2C read failed at addr {addr:#04x}, reg {reg}: {e}')
+        return None
 
 # run on module import
 try:
     import RPi.GPIO as GPIO
 except Exception as e:
     GPIO = None
-    print(f'exception importing RPi.GPIO: {e}\nwill print instead of sending over serial')
+    logger.warn(f'exception importing RPi.GPIO: {e}')
 
 try:
     bus = SMBus(1)
 except Exception as e:
     bus = None
-    print(f'exception initializing i2c bus: {e}\nwill print instead of sending over serial')
+    logger.warn(f'exception initializing i2c bus: {e}')
