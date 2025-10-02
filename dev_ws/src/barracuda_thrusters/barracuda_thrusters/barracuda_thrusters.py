@@ -48,7 +48,7 @@ class BarracudaThrusters(Node):
                     if teensy_pwm_freq != f2pwm.PWM_FREQ:
                         self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
                     #assert teensy_t200_init == f2pwm.T200_INIT, 'one or both of the teensy t200 init reg values are not equal to f2pwm.T200_INIT' 
-            except:
+            except Exception as e:
                 self.get_logger().warning(f"Failed to talk to board at {i2c_addr:#04x}: {e}")
                 
     def subscriber_callback(self, msg, thruster_idx):
@@ -62,7 +62,7 @@ class BarracudaThrusters(Node):
                 teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
                 pwm_duty_cycle_val
             )
-        except OSError as e:  
+        except Exception as e:  
             self.get_logger().warning(
                 f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
             )
