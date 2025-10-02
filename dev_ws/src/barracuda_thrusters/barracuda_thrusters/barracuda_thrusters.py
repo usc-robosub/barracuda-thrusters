@@ -31,8 +31,16 @@ class BarracudaThrusters(Node):
             teensy_pwm_bit_res = teensy.read_i2c_16(i2c_addr, teensy.PWM_BIT_RES_REG)
             teensy_t200_init = teensy.read_i2c_16(i2c_addr, teensy.T200_INIT_REG)
             if not (teensy_pwm_freq is None and teensy_pwm_bit_res is None and teensy_t200_init is None):
+                if teensy_pwm_freq != f2pwm.PWM_FREQ:
+                    self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
                 assert teensy_pwm_freq == f2pwm.PWM_FREQ, 'one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ'
+
+                if teensy_pwm_bit_res != f2pwm.PWM_BIT_RES:
+                    self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
                 assert teensy_pwm_bit_res == f2pwm.PWM_BIT_RES, 'one or both of the teensy pwm bit res reg values are not equal to f2pwm.PWM_BIT_RES' 
+                
+                if teensy_pwm_freq != f2pwm.PWM_FREQ:
+                    self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
                 assert teensy_t200_init == f2pwm.T200_INIT, 'one or both of the teensy t200 init reg values are not equal to f2pwm.T200_INIT' 
 
     def subscriber_callback(self, msg, thruster_idx):
