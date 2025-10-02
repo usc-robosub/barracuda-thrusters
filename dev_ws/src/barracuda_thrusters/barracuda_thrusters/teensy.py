@@ -34,7 +34,7 @@ def read_i2c_16(addr, reg):
         logger.info(f'reading from address {addr:02x}, reg {reg}')
 
     try:
-        val = struct.unpack("<H", bus.read_i2c_block_data(addr, reg, 2))[0]
+        val = struct.unpack("<H", bytes(bus.read_i2c_block_data(addr, reg, 2)))[0]
         return val
     except Exception as e:
         logger.error(f'I2C read failed at addr {addr:#04x}, reg {reg}: {e}')
