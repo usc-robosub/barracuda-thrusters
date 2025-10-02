@@ -28,7 +28,7 @@ def write_i2c_16(addr, reg, val):
         print(f"Error writing to target: {e}")
         print(addr, reg)
         print("Check that the wiring is correct and you're using the correct pins.")
-        exit()
+        # exit()  <-- comment this out so node continues
 
 
 def read_i2c_16(addr, reg):
