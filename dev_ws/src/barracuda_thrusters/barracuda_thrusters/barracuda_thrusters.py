@@ -36,7 +36,7 @@ class BarracudaThrusters(Node):
 
             if teensy_pwm_freq is None or teensy_pwm_bit_res is None or teensy_t200_init is None:
                 self.get_logger().error(f'could not read from {i2c_addr:#04x}')
-                return
+                continue
 
             if teensy_pwm_freq != f2pwm.PWM_FREQ:
                 self.get_logger().warn(f'PWM freq at {i2c_addr:#04x} not equal to f2pwm.PWM_FREQ')
