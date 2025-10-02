@@ -39,7 +39,7 @@ def read_i2c_16(addr, reg):
         data = bus.read_i2c_block_data(addr, reg, 2)
     except Exception as e:
         print(f"Error writing to target: {e}")
-        print(addr, reg)
+        print(f"I2C write failed at addr {addr:#04x}, reg {reg}: {e}")
         print("Check that the wiring is correct and you're using the correct pins.")
         exit()
     return data

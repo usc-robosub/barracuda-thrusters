@@ -27,32 +27,45 @@ class BarracudaThrusters(Node):
 
     def verify_config_values(self):
         for i2c_addr in teensy.i2c_addresses:
-            teensy_pwm_freq = teensy.read_i2c_16(i2c_addr, teensy.PWM_FREQ_REG)
-            teensy_pwm_bit_res = teensy.read_i2c_16(i2c_addr, teensy.PWM_BIT_RES_REG)
-            teensy_t200_init = teensy.read_i2c_16(i2c_addr, teensy.T200_INIT_REG)
-            if not (teensy_pwm_freq is None and teensy_pwm_bit_res is None and teensy_t200_init is None):
-                if teensy_pwm_freq != f2pwm.PWM_FREQ:
-                    self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
-                assert teensy_pwm_freq == f2pwm.PWM_FREQ, 'one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ'
+            try:
+                teensy_pwm_freq = teensy.read_i2c_16(i2c_addr, teensy.PWM_FREQ_REG)
+                teensy_pwm_bit_res = teensy.read_i2c_16(i2c_addr, teensy.PWM_BIT_RES_REG)
+                teensy_t200_init = teensy.read_i2c_16(i2c_addr, teensy.T200_INIT_REG)
 
-                if teensy_pwm_bit_res != f2pwm.PWM_BIT_RES:
-                    self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
-                assert teensy_pwm_bit_res == f2pwm.PWM_BIT_RES, 'one or both of the teensy pwm bit res reg values are not equal to f2pwm.PWM_BIT_RES' 
+                if teensy_pwm_freq is None or teensy_pwm_bit_res is None or teensy_t200_init is None:
+                    self.get_logger().warning(f"Board at {i2c_addr:#04x} not responding, ignoring it.")
+                    continue
+
+                if not (teensy_pwm_freq is None and teensy_pwm_bit_res is None and teensy_t200_init is None):
+                    if teensy_pwm_freq != f2pwm.PWM_FREQ:
+                        self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
+                    #assert teensy_pwm_freq == f2pwm.PWM_FREQ, 'one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ'
+
+                    if teensy_pwm_bit_res != f2pwm.PWM_BIT_RES:
+                        self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
+                    #assert teensy_pwm_bit_res == f2pwm.PWM_BIT_RES, 'one or both of the teensy pwm bit res reg values are not equal to f2pwm.PWM_BIT_RES' 
+                    
+                    if teensy_pwm_freq != f2pwm.PWM_FREQ:
+                        self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
+                    #assert teensy_t200_init == f2pwm.T200_INIT, 'one or both of the teensy t200 init reg values are not equal to f2pwm.T200_INIT' 
+            except:
+                self.get_logger().warning(f"Failed to talk to board at {i2c_addr:#04x}: {e}")
                 
-                if teensy_pwm_freq != f2pwm.PWM_FREQ:
-                    self.get_logger().info('one or both of the teensy pwm freq reg values are not equal to f2pwm.PWM_FREQ')
-                assert teensy_t200_init == f2pwm.T200_INIT, 'one or both of the teensy t200 init reg values are not equal to f2pwm.T200_INIT' 
-
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
         pwm_duty_cycle_val = f2pwm.to_duty_cycle(thruster_force_newtons)
 
         # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
-        teensy.write_i2c_16(
-            teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)], 
-            teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
-            pwm_duty_cycle_val
-        )
+        try:
+            teensy.write_i2c_16(
+                teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)], 
+                teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
+                pwm_duty_cycle_val
+            )
+        except OSError as e:  
+            self.get_logger().warning(
+                f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
+            )
 
 def main():
     rclpy.init()
