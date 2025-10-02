@@ -6,6 +6,7 @@ services:
     user: root
     privileged: true
     image: barracuda-thrusters
+    container_name: barracuda-thrusters
     tty: true
     network_mode: host
     ipc: host
