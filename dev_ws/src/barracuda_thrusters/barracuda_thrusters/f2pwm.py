@@ -31,7 +31,7 @@ def _create_lut_lists(csv_filename='t200_18v_data.csv'):
 # convert force (newtons) to PWM width (microseconds)
 def _to_us(force_newtons):
     if force_newtons == 0:
-        return T200_STOPPED_PWM_WIDTH_US
+        return T200_INIT
     # Find index of leftmost value greater than or equal to force_newtons
     lut_idx = bisect_left(_force_vals, force_newtons)
     if lut_idx == 0:
@@ -59,4 +59,4 @@ def to_duty_cycle(force_newtons):
 # create lut on module import
 _pwm_widths, _force_vals = _create_lut_lists()
 
-__all__ = ['PWM_PIN_CONFIG', 'T200_STOPPED_PWM_WIDTH_US', 'to_duty_cycle']
+__all__ = ['PWM_PIN_CONFIG', 'T200_INIT', 'to_duty_cycle']
