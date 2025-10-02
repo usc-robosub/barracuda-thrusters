@@ -14,8 +14,8 @@ T200_INIT_REG = 4
 thruster_registers = [6, 8, 10, 12]
     
 def write_i2c_16(addr, reg, val):
-    if GPIO is None or bus is None:
-        logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
+    logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
+    if GPIO is None or bus is None:   
         return
     
     assert bus is not None, 'self.bus is None (it should not be if RPi.GPIO was imported)'
