@@ -40,12 +40,18 @@ class BarracudaThrusters(Node):
     def initialize_thrusters(self):
         #for thruster_idx in range(self.n_thrusters):
         thruster_idx = 6
-        
+
+        off = 0.0
+        msg = Float32()
+        msg.data = off
+        self.thruster_pubs[thruster_idx].publish(msg)
+        self.get_logger().info(f"Turning off thruster {thruster_idx}, data: {off}")
+
         init_force = 5.0
         msg = Float32()
         msg.data = init_force
         self.thruster_pubs[thruster_idx].publish(msg)
-        self.get_logger().info(f"initializing thruster {thruster_idx}, data {init_force}")
+        self.get_logger().info(f"initializing thruster {thruster_idx}, data: {init_force}")
 
         # wait
         time.sleep(2)
