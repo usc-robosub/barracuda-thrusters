@@ -39,21 +39,22 @@ class BarracudaThrusters(Node):
     # make each of the thrusters turn on for 1 second and then turn them off
     def initialize_thrusters(self):
         for thruster_idx in range(self.n_thrusters):
-            init_force = 2.0 # check to make sure this is correct syntax for Float32
+            init_force = 5.0
             msg = Float32()
             msg.data = init_force
             self.thruster_pubs[thruster_idx].publish(msg)
             self.get_logger().info(f"initializing thruster {thruster_idx}, data {init_force}")
 
-        # wait for 1 second
-        time.sleep(1)
+            # wait
+            time.sleep(2)
 
-        for thruster_idx in range(self.n_thrusters):
             off = 0.0 # check to make sure this is correct syntax for Float32
             msg = Float32()
             msg.data = off
             self.thruster_pubs[thruster_idx].publish(msg)
             self.get_logger().info(f"Turning off thruster {thruster_idx}, data: {off}")
+        
+            time.sleep(0.5)
 
     def verify_config_values(self):
         if teensy.GPIO is None:
