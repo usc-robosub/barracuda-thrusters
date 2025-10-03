@@ -30,6 +30,9 @@ def _create_lut_lists(csv_filename='t200_18v_data.csv'):
     
 # convert force (newtons) to PWM width (microseconds)
 def _to_us(force_newtons):
+    # checking for 0 force input explicitly and converting to 1500us (T200_INIT) in that case;
+    # based on linear interpolation logic, 0 force input  would result pwm width that doesn't 
+    # correspond with 0 force without this check
     if force_newtons == 0:
         return T200_INIT
     # Find index of leftmost value greater than or equal to force_newtons
