@@ -28,11 +28,11 @@ class BarracudaThrusters(Node):
             )
 
         # publisher array
-        self.publishers = [] 
+        self.thruster_pubs = [] 
         for thruster_idx in range(self.n_thrusters):
             topic = f'thrusters/input{thruster_idx}'
             pub = self.create_publisher(Float32, topic, 10)
-            self.publishers.append(pub)
+            self.thruster_pubs.append(pub)
 
         self.initialize_thrusters()
 
@@ -42,7 +42,7 @@ class BarracudaThrusters(Node):
             init_force = 2.0 # check to make sure this is correct syntax for Float32
             msg = Float32()
             msg.data = init_force
-            self.publishers[thruster_idx].publish(msg)
+            self.thruster_pubs[thruster_idx].publish(msg)
             self.get_logger().info(f"initializing thruster {thruster_idx}, data {init_force}")
 
         # wait for 1 second
@@ -52,7 +52,7 @@ class BarracudaThrusters(Node):
             off = 0.0 # check to make sure this is correct syntax for Float32
             msg = Float32()
             msg.data = off
-            self.publishers[thruster_idx].publish(msg)
+            self.thruster_pubs[thruster_idx].publish(msg)
             self.get_logger().info(f"Turning off thruster {thruster_idx}, data: {off}")
 
     def verify_config_values(self):
