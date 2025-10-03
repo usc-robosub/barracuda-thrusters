@@ -1,26 +1,23 @@
-FROM ros:noetic-ros-base-focal
-COPY . /opt/barracuda-thruster-output-controller
-SHELL ["/bin/bash", "-c"]
+FROM ros:jazzy-ros-base-noble
+
 RUN apt-get update && apt-get install -y \
     git \
     openssh-client \
     vim \
     i2c-tools \
-    python3-pandas \
-    python3-numpy \
-    python3-rospy \
-    python3-pip \
-    && pip3 install smbus2 sshkeyboard RPi.GPIO \
-    # && apt-get purge -y python3-pip \
-    # && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && chmod +x /opt/barracuda-thruster-output-controller/entrypoint.sh \
-    && mkdir /root/.ssh && chmod 700 /root/.ssh \
-    && ssh-keyscan github.com >> /root/.ssh/known_hosts \
-    && git config --global url."git@github.com:".insteadOf "https://github.com/" \
-    && echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc \
-    && echo "[ -f /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash ] && source /opt/barracuda-thruster-output-controller/catkin_ws/devel/setup.bash" >> /root/.bashrc \ 
-    && echo "cd /opt/barracuda-thruster-output-controller/catkin_ws" >> /root/.bashrc
-    
-WORKDIR /opt/barracuda-thruster-output-controller/catkin_ws/
-CMD ["/opt/barracuda-thruster-output-controller/entrypoint.sh"]
+    python3-smbus \
+    python3-rpi.gpio \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /opt/barracuda-thrusters
+
+RUN . /opt/ros/jazzy/setup.sh && \
+  cd /opt/barracuda-thrusters/dev_ws && \
+  colcon build --symlink-install
+
+RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc \
+  && echo "[ -f /opt/barracuda-thrusters/dev_ws/install/setup.bash ] && source /opt/barracuda-thrusters/dev_ws/install/setup.bash" >> ~/.bashrc \
+  && sed -i '1iforce_color_prompt=yes' ~/.bashrc
+
+WORKDIR /opt/barracuda-thrusters/dev_ws
+CMD ["/bin/bash", "/opt/barracuda-thrusters/entrypoint.sh"]

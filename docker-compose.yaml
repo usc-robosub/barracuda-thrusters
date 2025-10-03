@@ -1,18 +1,37 @@
 services:
-  barracuda-thruster-output-controller:
+  barracuda-thrusters: 
     build:
       context: .
       dockerfile: Dockerfile
     user: root
     privileged: true
-    image: barracuda-thruster-output-controller
-    container_name: thruster-controller
+    image: barracuda-thrusters
+    container_name: barracuda-thrusters
     tty: true
     network_mode: host
-    restart: "always"
+    ipc: host
+    # restart: "always"
+    # devices:
+    #   - /dev/i2c-1:/dev/i2c-1
     volumes:
-      # - $HOME/.gitconfig:/root/.gitconfig:ro
-      - $HOME/.ssh:/root/.ssh
-      - $PWD/catkin_ws:/opt/barracuda-thruster-output-controller/catkin_ws
+      - ${HOME}/.ssh:/root/.ssh
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: root
+    privileged: true
+    image: barracuda-thrusters
+    tty: true
+    network_mode: host
+    ipc: host
+    # restart: "always"
     devices:
       - /dev/i2c-1:/dev/i2c-1
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh
+      - ${HOME}/.gitconfig:/root/.gitconfig
+      - ${HOME}/.vimrc:/root/.vimrc
+      - ${PWD}:/opt/barracuda-thrusters
+    profiles: ["dev"]
+
