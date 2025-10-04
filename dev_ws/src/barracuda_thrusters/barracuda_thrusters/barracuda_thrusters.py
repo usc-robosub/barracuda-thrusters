@@ -34,16 +34,10 @@ class BarracudaThrusters(Node):
             pub = self.create_publisher(Float32, topic, 10)
             self.thruster_pubs.append(pub)
 
-
-        self.init_done = False
-        self.create_timer(1.0, self.initialize_thrusters)
+        self.create_timer(1.0, self.initialize_thrusters, oneshot=True)
 
     # make each of the thrusters turn on for 1 second and then turn them off
     def initialize_thrusters(self):
-        if self.init_done:
-            return
-        self.init_done = True
-
         #for thruster_idx in range(self.n_thrusters):
         thruster_idx = 6
 
@@ -53,11 +47,9 @@ class BarracudaThrusters(Node):
         self.thruster_pubs[thruster_idx].publish(msg)
         self.get_logger().info(f"initializing thruster {thruster_idx}, data: {init_force}")
 
-        self.create_timer(2.0, lambda: self.turn_off_thruster(thruster_idx))
+        self.create_timer(2.0, lambda: self.turn_off_thruster(thruster_idx), oneshot=True)
 
     def turn_off_thruster(self, thruster_idx):
-        if self.init_done:
-            return
         msg = Float32()
         msg.data = 0.0
         self.thruster_pubs[thruster_idx].publish(msg)
