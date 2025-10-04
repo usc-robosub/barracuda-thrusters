@@ -6,6 +6,8 @@ from . import teensy
 
 from std_msgs.msg import Float32
 
+import time
+
 class BarracudaThrusters(Node):
 
     def __init__(self):
@@ -15,6 +17,15 @@ class BarracudaThrusters(Node):
         # self.n_thrusters = self.get_parameter('n_thrusters').value
         self.n_thrusters = 8    
         self.verify_config_values()
+
+        for thruster_idx in range(self.n_thrusters):
+            self.reset_thruster(thruster_idx)
+        
+        self.shake_thrusters()
+
+        for thruster_idx in range(self.n_thrusters):
+            self.reset_thruster(thruster_idx)
+        
 
         for thruster_idx in range(self.n_thrusters):
             topic = f'thrusters/input{thruster_idx}'
@@ -44,17 +55,37 @@ class BarracudaThrusters(Node):
                 self.get_logger().warn(f'PWM bit res at {i2c_addr:#04x} not equal to f2pwm.PWM_BIT_RES')                
             if teensy_t200_init != f2pwm.T200_INIT:
                 self.get_logger().warn(f'PWM T200 init at {i2c_addr:#04x} not equal to f2pwm.T200_INIT')
-                
+               
+    # sends the duty cycle val for 1500us (stopped pwm width) to all thrusters - this inits/stops the thrusters
+    def reset_thruster(self, thruster_idx):
+            self._write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=0))
+    
+    def shake_thrusters(self):
+        #for thruster_idx in range(self.n_thrusters):
+        thruster_idx = 6
+        shake_force = 5.0
+        # msg.data = shake_force
+        # self.thruster_pubs[thruster_idx].publish(msg)
+
+        self.get_logger().info(f"shaking thruster {thruster_idx}, data: {shake_force}")
+
+        self._write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=shake_force))
+        time.sleep(1)
+            
+
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
         pwm_duty_cycle_val = f2pwm.to_duty_cycle(thruster_force_newtons)
-
-        # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
+        self._write_to_thruster_reg(thruster_idx, pwm_duty_cycle_val)
+    
+    # helper function to write a value to a thruster register on the teensy
+    def _write_to_thruster_reg(self, thruster_idx, val):
         try:
+            # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
             teensy.write_i2c_16(
                 teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)], 
                 teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
-                pwm_duty_cycle_val
+                val
             )
         except Exception as e:  
             self.get_logger().warning(
