@@ -56,6 +56,8 @@ class BarracudaThrusters(Node):
         self.create_timer(2.0, lambda: self.turn_off_thruster(thruster_idx))
 
     def turn_off_thruster(self, thruster_idx):
+        if self.init_done:
+            return
         msg = Float32()
         msg.data = 0.0
         self.thruster_pubs[thruster_idx].publish(msg)
