@@ -3,7 +3,7 @@ Dockerized barracuda_thrusters ROS node:
 - Subscribes to topics named thrusters/inputi for i in {0, ..., 7}; each thruster has an associated topic
     - The value in the message published to thrusters/inputi represents the force in units of Newtons for thruster i to apply
     - The message type is std_msgs/Float32
-- Translates the force values in Newtons into appropriate values to be outputted on the PWM pins on the Teensys that are connected to the thrusters
+- Translates the force values in Newtons into appropriate values to be outputted on the Teensy PWM pins
     - Convert force in N to force in kgF
     - Used the performance chart for 18V to get pulse width in microseconds needed to apply desired force
         - Used linear interpolation to get pulse width for kgF values between two kgF values on the chart
