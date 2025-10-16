@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.task import Future
 
 from . import f2pwm
 from . import teensy
@@ -21,6 +22,10 @@ class BarracudaThrusters(Node):
         for thruster_idx in range(self.n_thrusters):
             self.reset_thruster(thruster_idx)
         
+        future = Future()
+        timer = self.create_timer(3.0,lambda:future.set_result(True))
+        rclpy.spin_until_future_complete(self,future)
+        timer.cancel()
         self.shake_thrusters()
 
         for thruster_idx in range(self.n_thrusters):
@@ -70,7 +75,10 @@ class BarracudaThrusters(Node):
         self.get_logger().info(f"shaking thruster {thruster_idx}, data: {shake_force}")
 
         self._write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=shake_force))
-        time.sleep(1)
+        future = Future()
+        timer = self.create_timer(3.0,lambda:future.set_result(True))
+        rclpy.spin_until_future_complete(self,future)
+        timer.cancel()
             
 
     def subscriber_callback(self, msg, thruster_idx):
