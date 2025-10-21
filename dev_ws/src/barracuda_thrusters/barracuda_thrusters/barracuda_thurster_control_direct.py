@@ -1,8 +1,8 @@
 import argparse
 import time
 
-from . import f2pwm
-from . import teensy
+import f2pwm
+import teensy
 
 n_thrusters=8
 
