@@ -29,9 +29,9 @@ def main():
     print("turn_force", args.turn_force)
     print("turn_time_ms", args.turn_time_ms)
 
-    thruster_idx=int(args.thruster_in)
+    thruster_idx=int(args.thruster_id)
     _write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=float(args.turn_force)))
-    time.sleep(float(args.turn_time_ms/1000))
+    time.sleep(float(args.turn_time_ms)/1000)
     _write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=0))
 if __name__ == "__main__":
     main()
