@@ -6,7 +6,7 @@ import teensy
 
 n_thrusters=8
 
-def _write_to_thruster_reg( thruster_idx, val):
+def _write_to_thruster_reg(thruster_idx, val):
     try:
         # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
         teensy.write_i2c_16(
@@ -29,8 +29,9 @@ def main():
     print("turn_force", args.turn_force)
     print("turn_time_ms", args.turn_time_ms)
 
-    _write_to_thruster_reg(args.thruster_id, f2pwm.to_duty_cycle(force_newtons=args.turn_force))
-    time.sleep(args.turn_time_ms/1000)
-    _write_to_thruster_reg(args.thruster_id, f2pwm.to_duty_cycle(force_newtons=0))
+    thruster_idx=int(args.thruster_in)
+    _write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=float(args.turn_force)))
+    time.sleep(float(args.turn_time_ms/1000))
+    _write_to_thruster_reg(thruster_idx, f2pwm.to_duty_cycle(force_newtons=0))
 if __name__ == "__main__":
     main()
