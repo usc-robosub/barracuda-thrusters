@@ -7,11 +7,9 @@ logger = get_logger('Teensy')
 
 i2c_addresses = [0x2d, 0x2e]
 
-PWM_FREQ_REG = 8
-PWM_BIT_RES_REG = 10
-T200_INIT_REG = 12
+KILLSWITCH_REG = 16
 
-thruster_registers = [0, 2, 4, 6]
+thruster_registers = [0, 4, 8, 12]
     
 def write_i2c_float(addr, reg, val):
     if GPIO is None or bus is None:   
@@ -25,6 +23,19 @@ def write_i2c_float(addr, reg, val):
         bus.write_i2c_block_data(addr, reg, data)
     except Exception as e:
         logger.error(f'I2C float write failed at addr {addr:#04x}, reg {reg}: {e}')
+
+def write_i2c_char(addr, reg, val):
+    if GPIO is None or bus is None:   
+        return
+    
+    logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
+
+    # c is for float (8-bit)
+    data = list(struct.pack('<c', val))
+    try:
+        bus.write_i2c_block_data(addr, reg, data)
+    except Exception as e:
+        logger.error(f'I2C char write failed at addr {addr:#04x}, reg {reg}: {e}')
 
 
 def read_i2c_char(addr, reg):

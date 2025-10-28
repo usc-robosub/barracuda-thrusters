@@ -1,10 +1,11 @@
 import rclpy
 from rclpy.node import Node
 
-from . import f2pwm
 from . import teensy
 
 from std_msgs.msg import Float32
+
+from gpiozero import Button
 
 class BarracudaThrusters(Node):
 
@@ -24,16 +25,26 @@ class BarracudaThrusters(Node):
                 10
             )
 
+        # TODO: read killswitch gpio pin and send to teensy
+        # killswitch pin hi: latch is closed, killed = 0
+        # killswitch pin lo: latch is open, killed = 1 
+        killswitch_pin = Button(22)
+        def write_to_killswitch_regs(killed):
+            for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, killed)
+        if killswitch_pin.is_pressed():
+            write_to_killswitch_regs(0)
+        killswitch_pin.when_pressed = write_to_killswitch_regs(0)
+        killswitch_pin.when_released = write_to_killswitch_regs(1)
+
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
-        pwm_duty_cycle_val = f2pwm.to_duty_cycle(thruster_force_newtons)
 
         # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
         try:
             teensy.write_i2c_16(
                 teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)], 
                 teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
-                pwm_duty_cycle_val
+                thruster_force_newtons
             )
         except Exception as e:  
             self.get_logger().warning(
