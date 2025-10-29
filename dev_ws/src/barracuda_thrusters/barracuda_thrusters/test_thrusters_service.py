@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
-from barracuda_thrusters_interfaces.srv import TestThrusters
+# from barracuda_thrusters_interfaces.srv import TestThrusters
+from std_srvs.srv import Empty
 
 NTHRUSTERS = 8
 
