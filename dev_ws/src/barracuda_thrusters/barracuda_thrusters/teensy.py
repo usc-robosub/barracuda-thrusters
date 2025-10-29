@@ -12,7 +12,7 @@ KILLSWITCH_REG = 16
 thruster_registers = [0, 4, 8, 12]
     
 def write_i2c_float(addr, reg, val):
-    if GPIO is None or bus is None:   
+    if bus is None:   
         return
     
     logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
@@ -25,7 +25,7 @@ def write_i2c_float(addr, reg, val):
         logger.error(f'I2C float write failed at addr {addr:#04x}, reg {reg}: {e}')
 
 def write_i2c_char(addr, reg, val):
-    if GPIO is None or bus is None:   
+    if bus is None:   
         return
     
     logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
@@ -39,10 +39,10 @@ def write_i2c_char(addr, reg, val):
 
 
 def read_i2c_char(addr, reg):
-    if GPIO is None or bus is None:
+    if bus is None:
         return None
 
-        logger.info(f'reading from address {addr:02x}, reg {reg}')
+    logger.info(f'reading from address {addr:02x}, reg {reg}')
 
     try:
         val = struct.unpack("<c", bytes(bus.read_i2c_block_data(addr, reg, 2)))[0]
