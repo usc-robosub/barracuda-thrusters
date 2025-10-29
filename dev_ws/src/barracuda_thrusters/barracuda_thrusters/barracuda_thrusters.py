@@ -28,7 +28,7 @@ class BarracudaThrusters(Node):
         # TODO: read killswitch gpio pin and send to teensy
         # killswitch pin hi: latch is closed, killed = 0
         # killswitch pin lo: latch is open, killed = 1 
-        killswitch_pin = Button(22)
+        killswitch_pin = Button(4)
         def write_to_killswitch_regs(killed):
             for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, killed)
         if killswitch_pin.is_pressed():
