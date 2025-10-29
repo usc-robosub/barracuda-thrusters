@@ -41,7 +41,7 @@ class BarracudaThrusters(Node):
 
         # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
         try:
-            teensy.write_i2c_16(
+            teensy.write_i2c_float(
                 teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)], 
                 teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)], 
                 thruster_force_newtons
