@@ -17,5 +17,10 @@ def generate_launch_description():
             parameters=[{
                 'n_thrusters': n_thrusters
             }],
-        )      
+        ),
+        Node(
+            package='barracuda_thrusters',
+            namespace='barracuda',
+            executable='test_thrusters_service',
+        )       
     ])
