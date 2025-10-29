@@ -31,7 +31,7 @@ class BarracudaThrusters(Node):
         killswitch_pin = Button(4)
         def write_to_killswitch_regs(killed):
             for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, killed)
-        if killswitch_pin.is_pressed():
+        if killswitch_pin.is_pressed:
             write_to_killswitch_regs(0)
         killswitch_pin.when_pressed = write_to_killswitch_regs(0)
         killswitch_pin.when_released = write_to_killswitch_regs(1)
