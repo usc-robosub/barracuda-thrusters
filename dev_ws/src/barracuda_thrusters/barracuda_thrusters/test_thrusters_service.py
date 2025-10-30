@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
 # from barracuda_thrusters_interfaces.srv import TestThrusters
-from std_srvs.srv import Empty
+from std_srvs.srv import Trigger
 import time
 
 NTHRUSTERS = 8
@@ -19,11 +19,13 @@ class TestThrustersService(Node):
 
     def test_thrusters_callback(self, request, response):
         self.get_logger.info('in service callback')
-        for thruster_idx in range(NTHRUSTERS):
-            publish_force_to_thruster(thruster_idx, TEST_FORCE)
-            time.sleep(1)
-            publish_force_to_thruster(thruster_idx, 0)
-            time.sleep(0.5)
+        response.success = True
+        response.message = 'service callback ran'
+        # for thruster_idx in range(NTHRUSTERS):
+        #     publish_force_to_thruster(thruster_idx, TEST_FORCE)
+        #     time.sleep(1)
+        #     publish_force_to_thruster(thruster_idx, 0)
+        #     time.sleep(0.5)
         return response
 
     def publish_force_to_thruster(thruster_idx, force):
