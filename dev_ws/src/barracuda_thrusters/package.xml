@@ -23,9 +23,6 @@
   <!-- f2pwm.py -->
   <exec_depend>ament_index_python</exec_depend>
 
-  <!-- for custom srv type -->
-  <exec_depend>barracuda_thrusters_interfaces</exec_depend>
-
   <export>
     <build_type>ament_python</build_type>
   </export>
