@@ -30,7 +30,7 @@ class TestThrustersService(Node):
 
     def publish_force_to_thruster(self, thruster_idx, force):
             msg = Float32()
-            msg.data = force
+            msg.data = float(force)
             self.pubs[thruster_idx].publish(msg)
 
 def main():
