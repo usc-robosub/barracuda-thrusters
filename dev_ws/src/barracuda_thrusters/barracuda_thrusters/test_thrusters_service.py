@@ -18,7 +18,7 @@ class TestThrustersService(Node):
             self.pubs[thruster_idx] = self.create_publisher(Float32, f'thrusters/input{thruster_idx}', 10)
 
     def test_thrusters_callback(self, request, response):
-        self.get_logger.info('in service callback')
+        self.get_logger().info('in service callback')
         response.success = True
         response.message = 'service callback ran'
         # for thruster_idx in range(NTHRUSTERS):
