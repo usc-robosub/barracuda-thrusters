@@ -33,8 +33,11 @@ class BarracudaThrusters(Node):
             for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, killed)
         if killswitch_pin.is_pressed:
             write_to_killswitch_regs(0)
-        killswitch_pin.when_pressed = lambda: write_to_killswitch_regs(0)
-        killswitch_pin.when_released = lambda: write_to_killswitch_regs(1)
+        # killswitch_pin.when_pressed = lambda: write_to_killswitch_regs(0)
+        # killswitch_pin.when_released = lambda: write_to_killswitch_regs(1)
+
+        killswitch_pin.when_pressed = lambda: self.get_logger().info('killswitch went from hi to lo')
+        killswitch_pin.when_released = lambda: self.get_logger().info('killswitch went from lo to hi')
 
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
