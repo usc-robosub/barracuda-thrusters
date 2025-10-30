@@ -11,7 +11,7 @@ TEST_FORCE = 2
 class TestThrustersService(Node):
     def __init__(self):
         super().__init__('test_thrusters_service')
-        self.srv = self.create_service(Empty, 'test_thrusters_service', self.test_thrusters_callback)
+        self.srv = self.create_service(Trigger, 'test_thrusters_service', self.test_thrusters_callback)
         self.get_logger().info('Created service')
         self.pubs = [None] * NTHRUSTERS
         for thruster_idx in range(NTHRUSTERS):
