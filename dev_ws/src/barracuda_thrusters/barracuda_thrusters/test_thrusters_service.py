@@ -28,7 +28,7 @@ class TestThrustersService(Node):
             # time.sleep(0.5)
         return response
 
-    def publish_force_to_thruster(thruster_idx, force):
+    def publish_force_to_thruster(self, thruster_idx, force):
             msg = Float32()
             msg.data = force
             self.pubs[thruster_idx].publish(msg)
