@@ -22,9 +22,9 @@ class TestThrustersService(Node):
         response.success = True
         response.message = 'service callback ran'
         for thruster_idx in range(NTHRUSTERS):
-            publish_force_to_thruster(thruster_idx, TEST_FORCE)
+            self.publish_force_to_thruster(thruster_idx, TEST_FORCE)
             time.sleep(1)
-            publish_force_to_thruster(thruster_idx, 0)
+            self.publish_force_to_thruster(thruster_idx, 0)
             time.sleep(0.5)
         return response
 
