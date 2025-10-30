@@ -8,8 +8,8 @@ TEST_FORCE = 2
 
 class TestThrustersService(Node):
     def __init__(self):
-        super().__init__('test_thrusters_service')
-        self.srv = self.create_service(Trigger, 'test_thrusters_service', self.test_thrusters_callback)
+        super().__init__('stop_thrusters_service')
+        self.srv = self.create_service(Trigger, 'stop_thrusters_service', self.test_thrusters_callback)
         self.get_logger().info('Created service')
         self.pubs = [None] * NTHRUSTERS
         for thruster_idx in range(NTHRUSTERS):
@@ -22,7 +22,7 @@ class TestThrustersService(Node):
         response.message = 'service callback ran'
         for thruster_idx in range(NTHRUSTERS):
             for i in range(2):
-                self.publish_force_to_thruster(thruster_idx, TEST_FORCE)
+                self.publish_force_to_thruster(thruster_idx, 0)
         return response
 
     def publish_force_to_thruster(self, thruster_idx, force):
@@ -36,9 +36,9 @@ class TestThrustersService(Node):
 def main():
     rclpy.init()
 
-    test_thrusters_service = TestThrustersService()
+    stop_thrusters_service = TestThrustersService()
 
-    rclpy.spin(test_thrusters_service)
+    rclpy.spin(stop_thrusters_service)
 
     rclpy.shutdown()
 
