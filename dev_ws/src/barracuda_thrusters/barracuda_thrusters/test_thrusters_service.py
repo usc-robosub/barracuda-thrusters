@@ -23,9 +23,9 @@ class TestThrustersService(Node):
         response.message = 'service callback ran'
         for thruster_idx in range(NTHRUSTERS):
             self.publish_force_to_thruster(thruster_idx, TEST_FORCE)
-            time.sleep(1)
+            # time.sleep(1)
             self.publish_force_to_thruster(thruster_idx, 0)
-            time.sleep(0.5)
+            # time.sleep(0.5)
         return response
 
     def publish_force_to_thruster(self, thruster_idx, force):
