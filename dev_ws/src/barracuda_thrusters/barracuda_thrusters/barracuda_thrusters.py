@@ -25,19 +25,21 @@ class BarracudaThrusters(Node):
                 10
             )
 
-        # TODO: read killswitch gpio pin and send to teensy
         # killswitch pin hi: latch is closed, killed = 0
         # killswitch pin lo: latch is open, killed = 1 
-        killswitch_pin = Button(4)
+        self.killswitch_pin = Button(4)
         def write_to_killswitch_regs(killed):
+            self.get_logger().info(f'killswitch signal is now {'lo' if killed == '0'.encode() else 'hi'}')
             for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, killed)
-        if killswitch_pin.is_pressed:
-            write_to_killswitch_regs(0)
-        # killswitch_pin.when_pressed = lambda: write_to_killswitch_regs(0)
-        # killswitch_pin.when_released = lambda: write_to_killswitch_regs(1)
+        if self.killswitch_pin.is_pressed:
+            write_to_killswitch_regs('0'.encode())
+        # "pressed": killswitch pin lo --> killed = 0
+        self.killswitch_pin.when_pressed = lambda: write_to_killswitch_regs('0'.encode())
+        # "released": killswitch pin hi --> killed = 1
+        self.killswitch_pin.when_released = lambda: write_to_killswitch_regs('1'.encode())
 
-        killswitch_pin.when_pressed = lambda: self.get_logger().info('killswitch went from hi to lo')
-        killswitch_pin.when_released = lambda: self.get_logger().info('killswitch went from lo to hi')
+        # self.killswitch_pin.when_pressed = lambda: self.get_logger().info('killswitch went from hi to lo')
+        # self.killswitch_pin.when_released = lambda: self.get_logger().info('killswitch went from lo to hi')
 
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
