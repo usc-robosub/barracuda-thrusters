@@ -53,12 +53,6 @@ def read_i2c_char(addr, reg):
 
 # run on module import
 try:
-    import RPi.GPIO as GPIO
-except Exception as e:
-    GPIO = None
-    logger.warn(f'exception importing RPi.GPIO: {e}')
-
-try:
     bus = SMBus(1)
 except Exception as e:
     bus = None
