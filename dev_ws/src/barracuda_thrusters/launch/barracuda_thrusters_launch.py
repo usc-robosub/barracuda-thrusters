@@ -18,14 +18,4 @@ def generate_launch_description():
                 'n_thrusters': n_thrusters
             }],
         ),
-        Node(
-            package='barracuda_thrusters',
-            namespace='barracuda',
-            executable='test_thrusters_service',
-        ),
-        Node(
-            package='barracuda_thrusters',
-            namespace='barracuda',
-            executable='stop_thrusters_service',
-        )         
     ])
