@@ -3,20 +3,26 @@ Dockerized barracuda_thrusters ROS node:
 - Subscribes to topics named thrusters/inputi for i in {0, ..., 7}; each thruster has an associated topic
     - The value in the message published to thrusters/inputi represents the force in units of Newtons for thruster i to apply
     - The message type is std_msgs/Float32
-- Translates the force values in Newtons into appropriate values to be outputted on the Teensy PWM pins
-    - Convert force in N to force in kgF
-    - Used the performance chart for 18V to get pulse width in microseconds needed to apply desired force
-        - Used linear interpolation to get pulse width for kgF values between two kgF values on the chart
-    - Used PWM frequency f=333Hz (T = 3003.003us) and bit resolution 8 bits to obtain a value n between 0 and 256 that would yield the desired PWM width, where the PWM width in microseconds evaluates to: T * (n/(bit resolution))
-        - The PWM frequency and bit resolution are both configurable on the Teensy. Currently, these configuration values are set independently in the barracuda_thrusters node (in the "F2PWM" force-to-pwm module) and on the Teensys, and the node verifies that its stored config values are consistent with the ones stored on the Teensy. Though we could have set these values on only one "source of truth" (either in the node code or in the Teensy code), and then had them set on the other device via serial based on the value set on the "source of truth," the current approach allows us to avoid synchronization logic to make sure that the values are set on the non-"source of truth" before starting regular operation. 
-- Sends these PWM values to the Teensys via I2C
-    - There are 8 thrusters total; 4 thrusters are connected to the PWM pins on one Teensy, and the other 4 are connected to the PWM pins on the other Teensy. Each Teensy target defines I2C registers 0, 2, 4, 6 for each of the four thrusters it’s responsible for generating PWM signals for, and each Teensy has a different I2C address (0x2d, 0x2e)
-    - The barracuda_thrusters node sends messages (duty cycle values) for thrusters 0-3 to the four registers at the first i2c address (0x2d), and messages for thrusters 4-7 t the four registers at the second i2c address (0x2e)
+
+- Sends these force values to the Teensys via I2C
+    - There are 8 thrusters total; 4 thrusters are connected to the PWM pins on one Teensy, and the other 4 are connected to the PWM pins on the other Teensy. Each Teensy target defines I2C registers 0, 4, 8, 12 for each of the four thrusters it’s responsible for generating PWM signals for, and each Teensy has a different I2C address (0x2d, 0x2e)
+    - The barracuda_thrusters node sends messages (force values) for thrusters 0-3 to the four registers at the first i2c address (0x2d), and messages for thrusters 4-7 at the four registers at the second i2c address (0x2e)
+
+- Enables and disables the Teensys based on killswitch input signal
+    - When the latch closes, the killswitch signal goes hi, and this node sets the "killed" register on the Teensys to '1' using teensy.py module write function
+    - When the latch opens, the killswitch signal goes lo, and the "killed" register on the Teensys is set to '0'
+
+- Provides testing scripts
+    - ```start_thruster <i>```, ```stop_thruster <i> ```, where i is 0-7, or "all"
+    - get into the docker container on the pi to run these:
+        - ```docker compose down && docker compose up -d --build```
+        - ``` docker exec -it barracuda-thrusters bash```
+        - ```start_thruster <i> ``` or ```stop_thruster <i> ```
 
 ### RPi Setup Instructions
 1. Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to install Raspberry Pi OS (64-bit Bookworm) on a microSD card. Make sure that you set it up with a network that your development machine will also be able to connect to. See [this article](https://www.thedigitalpictureframe.com/how-to-add-a-second-wifi-network-to-your-raspberry-pi/) to add a new network if the OS is already installed.
 2. Install Git with ```sudo apt-get install git```.
-3. [Install Docker Engine](https://docs.docker.com/engine/install/debian/), then follow [these instructions](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) so that you can use Docker without sudo. 
+3. [Install Docker Engine](https://docs.docker.com/engine/install/debian/), then follow [these instructions](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) so that you can use Docker without sudo (easiest way to do this is with the convenience script). 
 4. [Enable I2C interface](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c).
 
 ### Developing Directly on Your Own Pi (VS Code)
