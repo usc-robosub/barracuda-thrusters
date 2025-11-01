@@ -1,9 +1,8 @@
 import rclpy
 from rclpy.node import Node
-
 from . import teensy
-
 from std_msgs.msg import Float32
+from gpiozero import Button
 
 class BarracudaThrusters(Node):
 
@@ -23,8 +22,7 @@ class BarracudaThrusters(Node):
 
         # killswitch gpio setup #
         #########################
-        try:
-            from gpiozero import Button
+        try:    
             self.killswitch_pin = Button(4)
             def write_to_killswitch_regs(killed):
                 self.get_logger().info(f'killswitch signal is now {'lo' if killed == '0'.encode() else 'hi'}')
