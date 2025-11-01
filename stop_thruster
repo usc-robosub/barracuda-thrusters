@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "error: thruster index not specified"
+  exit 1
+fi
+
+start_thruster $1 0

@@ -20,5 +20,11 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc \
   && echo "[ -f /opt/barracuda-thrusters/dev_ws/install/setup.bash ] && source /opt/barracuda-thrusters/dev_ws/install/setup.bash" >> ~/.bashrc \
   && sed -i '1iforce_color_prompt=yes' ~/.bashrc
 
+RUN cd /usr/local/bin \
+  && ln -s /opt/barracuda-thrusters/start_thruster start_thruster \
+  && ln -s /opt/barracuda-thrusters/stop_thruster stop_thruster
+
+
+
 WORKDIR /opt/barracuda-thrusters/dev_ws
 CMD ["/bin/bash", "/opt/barracuda-thrusters/entrypoint.sh"]

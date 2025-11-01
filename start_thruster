@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "error: thruster index not specified"
+  exit 1
+fi
+
+sleeptime=4
+force=2
+if [ ! -z "$2" ]; then
+  force=$2
+fi
+
+pubpid=()
+if [ "$1" = "all" ]; then
+  sleeptime=10
+  for i in $(seq 0 7); do
+    ros2 topic pub -r 2 /barracuda/thrusters/input$i std_msgs/msg/Float32 "{data: $force}" & pubpid[$i]=$!
+  done
+else
+  ros2 topic pub -r 2 /barracuda/thrusters/input$1 std_msgs/msg/Float32 "{data: $force}" & pubpid=$!
+fi
+
+sleep $sleeptime
+
+kill -15 ${pubpid[@]}
