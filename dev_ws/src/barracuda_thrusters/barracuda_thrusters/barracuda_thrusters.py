@@ -5,16 +5,12 @@ from . import teensy
 
 from std_msgs.msg import Float32
 
-from gpiozero import Button
-
 class BarracudaThrusters(Node):
 
     def __init__(self):
         super().__init__('barracuda_thrusters')
 
-        # self.declare_parameter('n_thrusters', 8)
-        # self.n_thrusters = self.get_parameter('n_thrusters').value
-        self.n_thrusters = 8    
+        self.n_thrusters = 8
 
         for thruster_idx in range(self.n_thrusters):
             topic = f'thrusters/input{thruster_idx}'
@@ -25,21 +21,27 @@ class BarracudaThrusters(Node):
                 10
             )
 
-        # killswitch pin hi: latch is closed, killed = 0
-        # killswitch pin lo: latch is open, killed = 1 
-        self.killswitch_pin = Button(4)
-        def write_to_killswitch_regs(killed):
-            self.get_logger().info(f'killswitch signal is now {'lo' if killed == '0'.encode() else 'hi'}')
-            for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, killed)
-        if self.killswitch_pin.is_pressed:
-            write_to_killswitch_regs('0'.encode())
-        # "pressed": killswitch pin lo --> killed = 0
-        self.killswitch_pin.when_pressed = lambda: write_to_killswitch_regs('0'.encode())
-        # "released": killswitch pin hi --> killed = 1
-        self.killswitch_pin.when_released = lambda: write_to_killswitch_regs('1'.encode())
+        # killswitch gpio setup #
+        #########################
+        try:
+            from gpiozero import Button
+            self.killswitch_pin = Button(4)
+            def write_to_killswitch_regs(killed):
+                self.get_logger().info(f'killswitch signal is now {'lo' if killed == '0'.encode() else 'hi'}')
+                for addr in teensy.i2c_addresses: teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, killed)
 
-        # self.killswitch_pin.when_pressed = lambda: self.get_logger().info('killswitch went from hi to lo')
-        # self.killswitch_pin.when_released = lambda: self.get_logger().info('killswitch went from lo to hi')
+            # killed reg on teensys is set to '1' by default - if the latch is closed on node startup,
+            # this line sets the killed reg on teensys to '0' to enable the thrusters
+            if self.killswitch_pin.is_pressed:
+                write_to_killswitch_regs('0'.encode())
+
+            # "pressed": killswitch pin went lo (latch was closed) --> set killed = '0'
+            self.killswitch_pin.when_pressed = lambda: write_to_killswitch_regs('0'.encode())
+
+            # "released": killswitch pin went hi (latch was opened)--> set killed = '1'
+            self.killswitch_pin.when_released = lambda: write_to_killswitch_regs('1'.encode())
+        except Exception as e:
+            self.get_logger().warn(f'problem with gpio setup: {e}')
 
     def subscriber_callback(self, msg, thruster_idx):
         thruster_force_newtons = msg.data
