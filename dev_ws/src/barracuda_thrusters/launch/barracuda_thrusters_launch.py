@@ -17,5 +17,5 @@ def generate_launch_description():
             parameters=[{
                 'n_thrusters': n_thrusters
             }],
-        )      
+        ),
     ])

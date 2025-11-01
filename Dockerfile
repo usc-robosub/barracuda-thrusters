@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
     vim \
     i2c-tools \
     python3-smbus \
-    python3-rpi.gpio \
+    # python3-rpi.gpio \
+    python3-gpiozero \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /opt/barracuda-thrusters
