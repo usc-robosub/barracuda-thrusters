@@ -5,22 +5,22 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-sleeptime=4
+npubs=2
+sleeptime=0.25
 force=2
+start=$1
+end=$1
 if [ ! -z "$2" ]; then
   force=$2
 fi
 
-pubpid=()
 if [ "$1" = "all" ]; then
-  sleeptime=10
-  for i in $(seq 0 7); do
-    ros2 topic pub -r 2 /barracuda/thrusters/input$i std_msgs/msg/Float32 "{data: $force}" & pubpid[$i]=$!
-  done
-else
-  ros2 topic pub -r 2 /barracuda/thrusters/input$1 std_msgs/msg/Float32 "{data: $force}" & pubpid=$!
+  start=0
+  end=7
 fi
 
-sleep $sleeptime
-
-kill -15 ${pubpid[@]}
+for ((t=$start; t<=$end; t++)); do
+  for ((i=0; i<$npubs; i++)); do 
+    ros2 topic pub -1 /barracuda/thrusters/input$t std_msgs/msg/Float32 "{data: $force}" 
+  done
+done
