@@ -7,7 +7,10 @@ RUN apt-get update && apt-get install -y \
     i2c-tools \
     python3-smbus \
     # python3-rpi.gpio \
+    ros-jazzy-foxglove-bridge \
     python3-gpiozero \
+    iproute2 \
+
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /opt/barracuda-thrusters
