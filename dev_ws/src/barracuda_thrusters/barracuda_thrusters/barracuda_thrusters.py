@@ -25,7 +25,7 @@ class BarracudaThrusters(Node):
         #     )
 
         cmd_thrust_subscription = self.create_subscription(
-            JointState, "/cmd_thrust", self.joint_state_subscriber_callback, 10
+            JointState, "cmd_thrust", self.joint_state_subscriber_callback, 10
         )
 
         # killswitch gpio setup #
