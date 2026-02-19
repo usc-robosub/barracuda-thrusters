@@ -1,4 +1,5 @@
 import rclpy
+import numpy as np
 from gpiozero import Button
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
@@ -58,7 +59,7 @@ class BarracudaThrusters(Node):
             self.get_logger().warn(f"problem with gpio setup: {e}")
 
     def joint_state_subscriber_callback(self, msg):
-        thruster_efforts = msg.effort
+        thruster_efforts = np.array(msg.effort, dtype=np.float16)
 
         for thruster_idx in range(self.n_thrusters):
             # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
