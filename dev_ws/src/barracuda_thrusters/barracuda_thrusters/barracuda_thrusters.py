@@ -61,6 +61,10 @@ class BarracudaThrusters(Node):
     def joint_state_subscriber_callback(self, msg):
         thruster_efforts = np.array(msg.effort, dtype=np.float16)
 
+        # log both arrays to the console to verify conversion
+        self.get_logger().info(f"Original msg.effort: {msg.effort}")
+        self.get_logger().info(f"Converted thruster_efforts: {thruster_efforts}")
+
         for thruster_idx in range(self.n_thrusters):
             # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
             try:
