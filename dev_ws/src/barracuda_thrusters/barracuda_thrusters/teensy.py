@@ -17,7 +17,7 @@ def write_i2c_float(addr, reg, val):
     
     logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
 
-    # f is for float (16-bit)
+    # f is for float (32-bit)
     data = list(struct.pack('<f', val))
     try:
         bus.write_i2c_block_data(addr, reg, data)
