@@ -18,7 +18,8 @@ def write_i2c_float(addr, reg, val):
     logger.info(f'sending {val} to address {addr:02x}, reg {reg}')
 
     # f is for float (32-bit)
-    data = list(struct.pack('<f', val))
+    # e is for float (16-bit)
+    data = list(struct.pack('<e', val))
     try:
         bus.write_i2c_block_data(addr, reg, data)
     except Exception as e:
