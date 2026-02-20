@@ -59,7 +59,7 @@ class BarracudaThrusters(Node):
             self.get_logger().warn(f"problem with gpio setup: {e}")
 
     def joint_state_subscriber_callback(self, msg):
-        thruster_efforts = np.array(msg.effort, dtype=np.float16)
+        thruster_efforts = np.array(msg.effort, dtype=np.float32)
 
         # log both arrays to the console to verify conversion
         self.get_logger().info(f"Original msg.effort: {msg.effort}")
