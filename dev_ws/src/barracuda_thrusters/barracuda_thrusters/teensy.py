@@ -46,7 +46,7 @@ def read_i2c_char(addr, reg):
     logger.info(f'reading from address {addr:02x}, reg {reg}')
 
     try:
-        val = struct.unpack("<c", bytes(bus.read_i2c_block_data(addr, reg, 2)))[0]
+        val = struct.unpack("<c", bytes(bus.read_i2c_block_data(addr, reg, 1)))[0]
         return val
     except Exception as e:
         logger.error(f'I2C char read failed at addr {addr:#04x}, reg {reg}: {e}')
@@ -54,7 +54,9 @@ def read_i2c_char(addr, reg):
 
 # run on module import
 try:
-    bus = SMBus(1)
+    # on RPI: pins 3 and 5 map to I2C Bus 1
+    # on jetson orin nano: pins 27 and 28 map to I2C Bus 1
+    bus = SMBus(1) 
 except Exception as e:
     bus = None
-    logger.warn(f'exception initializing i2c bus: {e}')
+    logger.warning(f'exception initializing i2c bus: {e}')
