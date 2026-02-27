@@ -1,7 +1,6 @@
 from rclpy.logging import get_logger
 from smbus import SMBus
 import struct
-from collections import namedtuple
 
 logger = get_logger('Teensy')
 

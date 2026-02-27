@@ -3,7 +3,6 @@ import numpy as np
 from gpiozero import Button
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Float32, Float64
 
 from . import teensy
 
@@ -14,18 +13,7 @@ class BarracudaThrusters(Node):
 
         self.n_thrusters = 8
 
-        # for thruster_idx in range(self.n_thrusters):
-        #     topic = f"thrusters/input{thruster_idx}"
-        #     self.create_subscription(
-        #         Float32,
-        #         topic,
-        #         lambda msg, thruster_idx=thruster_idx: self.subscriber_callback(
-        #             msg, thruster_idx
-        #         ),
-        #         10,
-        #     )
-
-        cmd_thrust_subscription = self.create_subscription(
+        self.cmd_thrust_subscription = self.create_subscription(
             JointState, "cmd_thrust", self.joint_state_subscriber_callback, 10
         )
 
@@ -59,11 +47,8 @@ class BarracudaThrusters(Node):
             self.get_logger().warn(f"problem with gpio setup: {e}")
 
     def joint_state_subscriber_callback(self, msg):
+        # teensy registers expect 32-bit floats 
         thruster_efforts = np.array(msg.effort, dtype=np.float32)
-
-        # log both arrays to the console to verify conversion
-        self.get_logger().info(f"Original msg.effort: {msg.effort}")
-        self.get_logger().info(f"Converted thruster_efforts: {thruster_efforts}")
 
         for thruster_idx in range(self.n_thrusters):
             # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
@@ -77,21 +62,6 @@ class BarracudaThrusters(Node):
                 self.get_logger().warning(
                     f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
                 )
-
-    # def subscriber_callback(self, msg, thruster_idx):
-    #     thruster_force_newtons = msg.data
-
-    #     # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
-    #     try:
-    #         teensy.write_i2c_float(
-    #             teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)],
-    #             teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)],
-    #             thruster_force_newtons,
-    #         )
-    #     except Exception as e:
-    #         self.get_logger().warning(
-    #             f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
-    #         )
 
 
 def main():
