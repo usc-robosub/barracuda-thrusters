@@ -1,30 +1,27 @@
-FROM ros:humble-ros-base-jammy
+FROM ros:humble-ros-base-humble
 
 RUN apt-get update && apt-get install -y \
     git \
     openssh-client \
     vim \
     i2c-tools \
-    python3-smbus \
-    # python3-rpi.gpio \
-    python3-gpiozero \
+    python3-colcon-common-extensions \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /opt/barracuda-thrusters
+RUN rosdep update
 
-RUN . /opt/ros/humble/setup.sh && \
-    cd /opt/barracuda-thrusters/dev_ws && \
-    colcon build --symlink-install
+WORKDIR /ros2_ws
+
+COPY barracuda_thrusters /ros2_ws/src/barracuda_thrusters
+
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc \
-    && echo "[ -f /opt/barracuda-thrusters/dev_ws/install/setup.bash ] && source /opt/barracuda-thrusters/dev_ws/install/setup.bash" >> ~/.bashrc \
+    && echo "[ -f /ros2_ws/install/setup.bash ] && source /ros2_ws/install/setup.bash" >> ~/.bashrc \
     && sed -i '1iforce_color_prompt=yes' ~/.bashrc
 
-RUN cd /usr/local/bin \
-    && ln -s /opt/barracuda-thrusters/start_thruster start_thruster \
-    && ln -s /opt/barracuda-thrusters/stop_thruster stop_thruster
+ENTRYPOINT ["/entrypoint.sh"]
 
-
-
-WORKDIR /opt/barracuda-thrusters/dev_ws
-CMD ["/bin/bash", "/opt/barracuda-thrusters/entrypoint.sh"]
+CMD ["bash"]

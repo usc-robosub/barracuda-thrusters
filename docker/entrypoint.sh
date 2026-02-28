@@ -1,3 +1,17 @@
-source /opt/ros/jazzy/setup.bash
-source /opt/barracuda-thrusters/dev_ws/install/setup.bash
-ros2 launch barracuda_thrusters barracuda_thrusters_launch.py
+#!/bin/bash
+set -e
+
+echo "Installing dependencies..."
+apt-get update
+rosdep install --from-paths src --ignore-src -y --skip-keys="python3-jetson-gpio"
+
+echo "Building ROS 2 workspace..."
+colcon build --symlink-install
+
+source install/setup.bash
+
+echo "=========================================="
+echo " Barracuda Thrusters Workspace Ready! "
+echo "=========================================="
+
+exec "$@"

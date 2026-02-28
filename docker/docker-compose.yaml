@@ -1,8 +1,8 @@
 services:
-  barracuda-thrusters: 
+  barracuda-thrusters:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     user: root
     privileged: true
     image: barracuda-thrusters
@@ -11,27 +11,28 @@ services:
     network_mode: host
     ipc: host
     # restart: "always"
+    # Uncomment these when deploying to the Jetson/Raspberry Pi
     # devices:
     #   - /dev/i2c-1:/dev/i2c-1
     volumes:
       - ${HOME}/.ssh:/root/.ssh
   dev:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     user: root
     privileged: true
-    image: barracuda-thrusters
+    image: barracuda-thrusters-dev
     tty: true
     network_mode: host
     ipc: host
     # restart: "always"
+    # Uncomment these when deploying to the Jetson/Raspberry Pi
     # devices:
     #  - /dev/i2c-1:/dev/i2c-1
     volumes:
       - ${HOME}/.ssh:/root/.ssh
       - ${HOME}/.gitconfig:/root/.gitconfig
       - ${HOME}/.vimrc:/root/.vimrc
-      - ${PWD}:/opt/barracuda-thrusters
+      - ../barracuda_thrusters:/ros2_ws/src/barracuda_thrusters
     profiles: ["dev"]
-
