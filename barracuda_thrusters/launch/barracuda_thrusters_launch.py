@@ -6,6 +6,8 @@ def generate_launch_description():
         Node(
             package='barracuda_thrusters',
             namespace='barracuda',
-            executable='barracuda_thrusters'
+            executable='barracuda_thrusters',
+            output='screen',
+            emulate_tty=True
         ),
     ])
