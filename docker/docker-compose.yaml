@@ -10,13 +10,9 @@ services:
     tty: true
     network_mode: host
     ipc: host
-    # restart: "always"
-    # Uncomment these when deploying to the Jetson/Raspberry Pi
-    # devices:
-    #   - /dev/i2c-1:/dev/i2c-1
     volumes:
       - ${HOME}/.ssh:/root/.ssh
-  dev:
+  barracuda-thrusters-dev:
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -26,10 +22,6 @@ services:
     tty: true
     network_mode: host
     ipc: host
-    # restart: "always"
-    # Uncomment these when deploying to the Jetson/Raspberry Pi
-    # devices:
-    #  - /dev/i2c-1:/dev/i2c-1
     volumes:
       - ${HOME}/.ssh:/root/.ssh
       - ${HOME}/.gitconfig:/root/.gitconfig

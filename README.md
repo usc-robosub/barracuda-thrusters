@@ -1,37 +1,90 @@
 # barracuda-thrusters
-Dockerized barracuda_thrusters ROS node:
-- Subscribes to topics named thrusters/inputi for i in {0, ..., 7}; each thruster has an associated topic
-    - The value in the message published to thrusters/inputi represents the force in units of Newtons for thruster i to apply
-    - The message type is std_msgs/Float32
 
-- Sends these force values to the Teensys via I2C
-    - There are 8 thrusters total; 4 thrusters are connected to the PWM pins on one Teensy, and the other 4 are connected to the PWM pins on the other Teensy. Each Teensy target defines I2C registers 0, 4, 8, 12 for each of the four thrusters it’s responsible for generating PWM signals for, and each Teensy has a different I2C address (0x2d, 0x2e)
-    - The barracuda_thrusters node sends messages (force values) for thrusters 0-3 to the four registers at the first i2c address (0x2d), and messages for thrusters 4-7 at the four registers at the second i2c address (0x2e)
+Dockerized `barracuda_thrusters` ROS 2 Humble node. This package handles the hardware interface for the vehicle's thrusters, converting desired force values from the control module into PWM signals via I2C.
 
-- Enables and disables the Teensys based on killswitch input signal
-    - When the latch closes, the killswitch signal goes hi, and this node sets the "killed" register on the Teensys to '1' using teensy.py module write function
-    - When the latch opens, the killswitch signal goes lo, and the "killed" register on the Teensys is set to '0'
+### Core Functionality
 
-- Provides testing scripts
-    - ```start_thruster <i>```, ```stop_thruster <i> ```, where i is 0-7, or "all"
-    - get into the docker container on the pi to run these:
-        - ```docker compose down && docker compose up -d --build```
-        - ``` docker exec -it barracuda-thrusters bash```
-        - ```start_thruster <i> ``` or ```stop_thruster <i> ```
+- **Subscribes to `/barracuda/cmd_thrust`:** Listens for a `sensor_msgs/JointState` message containing the effort values (in Newtons) for all 8 thrusters in a single array.
+- **I2C Communication:** Sends these force values to two Teensy microcontrollers via I2C.
+  - 4 thrusters are connected to the PWM pins on the first Teensy (I2C address `0x2d`), utilizing registers 0, 4, 8, and 12.
+  - 4 thrusters are connected to the second Teensy (I2C address `0x2e`), utilizing the same registers.
+- **Hardware Killswitch:** Enables and disables the Teensys based on a physical GPIO killswitch input.
+  - When the latch closes (signal LOW), the node sets the "killed" register (16) on the Teensys to `0`.
+  - When the latch opens (signal HIGH), the "killed" register is set to `1`.
+- **Dynamic Hardware Mocking:** Built-in fallback architecture (`mock_gpio.py` and `mock_smbus.py`) allows the node to run natively on non-Jetson hardware (like a Mac or Windows PC) without crashing, enabling seamless local development.
 
-### RPi Setup Instructions
-1. Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to install Raspberry Pi OS (64-bit Bookworm) on a microSD card. Make sure that you set it up with a network that your development machine will also be able to connect to. See [this article](https://www.thedigitalpictureframe.com/how-to-add-a-second-wifi-network-to-your-raspberry-pi/) to add a new network if the OS is already installed.
-2. Install Git with ```sudo apt-get install git```.
-3. [Install Docker Engine](https://docs.docker.com/engine/install/debian/), then follow [these instructions](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) so that you can use Docker without sudo (easiest way to do this is with the convenience script). 
-4. [Enable I2C interface](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c).
+### Automated Testing
 
-### Developing Directly on Your Own Pi (VS Code)
-1. Install the following VS Code extensions: 
-    - [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-    - [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
-2. Connect the current window to the RPi in VS Code with Remote Explorer.
-3. Run ```git config --global user.name "yourname"``` and ```git config --global user.email "youremail"```.
-4. Run ```ssh-keygen``` to create an ssh key pair, then [add the public key to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
-5. Clone this repo into a location of your choice on the RPi (using the ssh link), then build the Docker image and run the container with ```docker compose up -d```.
-6. While in the remote window connected to the RPi, open the Remote Explorer extension again and select "Dev Containers" from the dropdown menu at the topc of the screen, to the right of the "Remote Explorer" text. The container you just ran should show up; attach to the container in a window. 
-7. Now you should be able to edit files, commit & push changes, and interact with the shell in the integrated terminal. 
+The legacy bash scripts have been replaced with a dedicated ROS 2 diagnostic node to verify hardware mapping and I2C communication.
+
+To run the automated thruster test:
+
+1. Exec into the running Docker container: `docker exec -it barracuda-thrusters bash`
+2. Run the diagnostic node: `ros2 run barracuda_thrusters test_thrusters`
+
+This node will automatically cycle through thrusters 1-8, sending a temporary test effort value to a single thruster every 2 seconds while keeping the others at 0.0.
+
+### Jetson AGX Setup Instructions (JetPack 6.2)
+
+JetPack 6.2 runs Ubuntu 22.04 and comes with the NVIDIA Container Toolkit natively integrated, making Docker setup straightforward.
+
+1. Ensure your Jetson is connected to a network accessible by your development machine.
+2. [Add your user to the Docker group](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) so you can run containers without `sudo`: `sudo usermod -aG docker $USER` (requires a logout/login to take effect).
+3. Ensure your user has permissions to access the I2C bus: `sudo usermod -aG i2c $USER`.
+4. Clone this repository onto the Jetson.
+
+### Running the Containers
+
+This repository uses a dual-file Docker Compose strategy to safely separate local development from hardware deployment.
+
+- **Local Development (Mac/Windows/x86 Linux):**
+  - Start the dev environment: `docker compose --profile dev up -d`
+  - Access the container: `docker exec -it barracuda-thrusters-dev \bin\bash`
+  - Stop the dev environment `docker compose --profile dev down --rmi all --remove-orphans`
+- **Hardware Deployment (Jetson AGX):**
+  - Start the production environment using the NVIDIA runtime override: `docker compose -f docker-compose.yaml -f docker-compose.jetson.yaml up -d`
+  - Access the container: `docker exec -it barracuda-thrusters \bin\bash`
+  - Stop the environment `docker compose --profile dev down --rmi all --remove-orphans`
+
+### Native ROS 2 Workspace Integration (No Docker)
+
+If you prefer to run this package natively on a Linux machine (without Docker) or integrate it into a larger vehicle control workspace, you can pull it in directly.
+
+#### Option A: Direct Clone
+
+Use this method if you are setting up a standalone ROS 2 workspace just for testing the thrusters natively.
+
+1. Create a new ROS 2 workspace and source directory: `mkdir -p ~/ros2_ws/src`
+2. Navigate to the source directory: `cd ~/ros2_ws/src`
+3. Clone the repository: `git clone https://github.com/usc-robosub/barracuda-thrusters.git`
+4. Navigate back to the workspace root: `cd ~/ros2_ws`
+5. Install necessary Python and ROS dependencies: `rosdep install --from-paths src --ignore-src -y`
+6. Build the package: `colcon build --symlink-install`
+7. Source the newly built workspace: `source install/setup.bash`
+
+#### Option B: As a Git Submodule
+
+Use this method if you already have a primary autonomous vehicle workspace (e.g., `auv_ws`) and want to include the thrusters as a tracked module.
+
+1. Navigate to your existing workspace's source directory: `cd ~/auv_ws/src`
+2. Add this repository as a submodule: `git submodule add https://github.com/usc-robosub/barracuda-thrusters.git`
+3. Commit the new submodule tracking file: `git commit -m "Added barracuda-thrusters submodule"`
+4. Navigate back to your workspace root: `cd ~/auv_ws`
+5. Install dependencies and build as usual:
+   - `rosdep install --from-paths src --ignore-src -y`
+   - `colcon build --symlink-install`
+
+- **Note for other developers cloning the parent repo:** When they pull the main vehicle repository, they will need to run `git submodule update --init --recursive` to fetch the contents of this thruster package.
+
+### Developing Directly on the Jetson (VS Code)
+
+1. Install the following VS Code extensions on your local machine:
+
+- [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- [Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
+
+1. Connect the current window to the Jetson in VS Code using the Remote Explorer (SSH).
+2. Run `git config --global user.name "yourname"` and `git config --global user.email "youremail"`.
+3. Run `ssh-keygen` to create an SSH key pair, then [add the public key to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+4. While in the remote window connected to the Jetson, open the Remote Explorer extension and select "Dev Containers" from the dropdown menu. Attach to the running `barracuda-thrusters` container.
+5. You can now edit files, commit, push changes, and interact with the ROS 2 workspace directly through the integrated terminal.

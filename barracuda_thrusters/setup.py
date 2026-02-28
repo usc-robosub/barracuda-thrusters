@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'barracuda_thrusters = barracuda_thrusters.barracuda_thrusters:main',
+            'test_thrusters = barracuda_thrusters.test_thrusters:main',
         ],
     },
 )

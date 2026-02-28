@@ -1,5 +1,4 @@
 from rclpy.logging import get_logger
-from smbus import SMBus
 import struct
 
 logger = get_logger('Teensy')
@@ -52,11 +51,15 @@ def read_i2c_char(addr, reg):
         logger.error(f'I2C char read failed at addr {addr:#04x}, reg {reg}: {e}')
         return None
 
-# run on module import
+# --- INITIALIZE HARDWARE OR FALLBACK TO MOCK ---
 try:
     # on RPI: pins 3 and 5 map to I2C Bus 1
     # on jetson orin nano: pins 27 and 28 map to I2C Bus 1
+    from smbus import SMBus
     bus = SMBus(1) 
 except Exception as e:
-    bus = None
-    logger.warning(f'exception initializing i2c bus: {e}')
+    # catch both ImportError (no library) AND FileNotFoundError/OSError (no hardware)
+    logger.warning(f'Physical I2C bus failed to initialize ({e}). Falling back to Mock SMBus.')
+    from .mock_smbus import SMBus as MockSMBus
+    bus = MockSMBus(1)
+# -----------------------------------------------

@@ -1,8 +1,14 @@
 import rclpy
 import numpy as np
-import Jetson.GPIO as GPIO
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
+
+# --- HARDWARE / MOCK IMPORT ---
+try:
+    import Jetson.GPIO as GPIO
+except ImportError:
+    from .mock_gpio import MockGPIO as GPIO
+# ------------------------------
 
 from . import teensy
 

@@ -1,4 +1,4 @@
-FROM ros:humble-ros-base-humble
+FROM ros:humble-ros-base-jammy
 
 RUN apt-get update && apt-get install -y \
     git \
