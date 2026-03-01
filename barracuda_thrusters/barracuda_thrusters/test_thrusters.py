@@ -56,7 +56,8 @@ def main(args=None):
         test_node.get_logger().info('Diagnostic sequence stopped.')
     finally:
         test_node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
