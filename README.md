@@ -15,11 +15,11 @@ Dockerized `barracuda_thrusters` ROS 2 Humble node. This package handles the har
 
 ### Automated Testing
 
-The legacy bash scripts have been replaced with a dedicated ROS 2 diagnostic node to verify hardware mapping and I2C communication.
+ROS 2 diagnostic node to verify hardware mapping and I2C communication.
 
 To run the automated thruster test:
 
-1. Exec into the running Docker container: `docker exec -it barracuda-thrusters bash`
+1. Exec into the running Docker container: `docker exec -it barracuda-thrusters \bin\bash`
 2. Run the diagnostic node: `ros2 run barracuda_thrusters test_thrusters`
 
 This node will automatically cycle through thrusters 1-8, sending a temporary test effort value to a single thruster every 2 seconds while keeping the others at 0.0.
@@ -44,7 +44,7 @@ This repository uses a dual-file Docker Compose strategy to safely separate loca
 - **Hardware Deployment (Jetson AGX):**
   - Start the production environment using the NVIDIA runtime override: `docker compose -f docker-compose.yaml -f docker-compose.jetson.yaml up -d`
   - Access the container: `docker exec -it barracuda-thrusters \bin\bash`
-  - Stop the environment `docker compose --profile dev down --rmi all --remove-orphans`
+  - Stop the environment `docker compose down --rmi all --remove-orphans`
 
 ### Native ROS 2 Workspace Integration (No Docker)
 
