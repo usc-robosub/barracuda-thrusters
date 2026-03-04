@@ -6,6 +6,7 @@ from sensor_msgs.msg import JointState
 # --- HARDWARE / MOCK IMPORT ---
 try:
     import Jetson.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
 except ImportError:
     from .mock_gpio import MockGPIO as GPIO
 # ------------------------------
