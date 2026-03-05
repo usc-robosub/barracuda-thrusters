@@ -1,15 +1,8 @@
 import rclpy
 import numpy as np
+from gpiozero import Button
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-
-# --- HARDWARE / MOCK IMPORT ---
-try:
-    import Jetson.GPIO as GPIO
-    GPIO.setmode(GPIO.BCM)
-except ImportError:
-    from .mock_gpio import MockGPIO as GPIO
-# ------------------------------
 
 from . import teensy
 
@@ -26,16 +19,8 @@ class BarracudaThrusters(Node):
 
         # killswitch gpio setup #
         #########################
-        # gpiozero (pi library) defaults to BCM pin numbering. BCM 4 is Physical Pin 7.
-        self.killswitch_pin = 4 
-
         try:
-            # Set pin numbering mode to BCM
-            GPIO.setmode(GPIO.BCM)
-            
-            # Setup pin as an input and enable the internal pull-up resistor.
-            # This mimics gpiozero.Button's default behavior.
-            GPIO.setup(self.killswitch_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            self.killswitch_pin = Button(4)
 
             def write_to_killswitch_regs(killed):
                 self.get_logger().info(
@@ -44,29 +29,20 @@ class BarracudaThrusters(Node):
                 for addr in teensy.i2c_addresses:
                     teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, killed)
 
-            # Callback function triggered by hardware interrupts
-            def killswitch_callback(channel):
-                # Because of the pull-up, LOW means the latch is closed ("pressed")
-                if GPIO.input(self.killswitch_pin) == GPIO.LOW:
-                    write_to_killswitch_regs("0".encode())
-                else:
-                    # HIGH means the latch is open ("released")
-                    write_to_killswitch_regs("1".encode())
-
-            # Check initial state on node startup
-            if GPIO.input(self.killswitch_pin) == GPIO.LOW:
+            # killed reg on teensys is set to '1' by default - if the latch is closed on node startup,
+            # this line sets the killed reg on teensys to '0' to enable the thrusters
+            if self.killswitch_pin.is_pressed:
                 write_to_killswitch_regs("0".encode())
 
-            # Attach the event detection to listen for BOTH rising and falling edges.
-            # bouncetime=50 adds a 50ms software debounce to ignore electrical noise 
-            # from the physical killswitch contacts bouncing when flipped.
-            GPIO.add_event_detect(
-                self.killswitch_pin, 
-                GPIO.BOTH, 
-                callback=killswitch_callback, 
-                bouncetime=50
+            # "pressed": killswitch pin went lo (latch was closed) --> set killed = '0'
+            self.killswitch_pin.when_pressed = lambda: write_to_killswitch_regs(
+                "0".encode()
             )
 
+            # "released": killswitch pin went hi (latch was opened)--> set killed = '1'
+            self.killswitch_pin.when_released = lambda: write_to_killswitch_regs(
+                "1".encode()
+            )
         except Exception as e:
             self.get_logger().warn(f"problem with gpio setup: {e}")
 
@@ -86,14 +62,6 @@ class BarracudaThrusters(Node):
                 self.get_logger().warning(
                     f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
                 )
-
-    def destroy_node(self):
-        # Ensure GPIO pins are released when the node is gracefully shut down
-        try:
-            GPIO.cleanup()
-        except Exception as e:
-            self.get_logger().warn(f"Failed to clean up GPIO: {e}")
-        super().destroy_node()
 
 
 def main():
