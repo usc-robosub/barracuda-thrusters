@@ -56,7 +56,7 @@ def read_i2c_char(addr, reg):
 
 # run on module import
 try:
-    bus = SMBus(1)
+    bus = SMBus(7)
 except Exception as e:
     bus = None
     logger.warn(f'exception initializing i2c bus: {e}')

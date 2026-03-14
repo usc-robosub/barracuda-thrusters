@@ -1,5 +1,5 @@
+import Jetson.GPIO as GPIO
 import rclpy
-from gpiozero import Button
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float32, Float64
@@ -13,17 +13,6 @@ class BarracudaThrusters(Node):
 
         self.n_thrusters = 8
 
-        # for thruster_idx in range(self.n_thrusters):
-        #     topic = f"thrusters/input{thruster_idx}"
-        #     self.create_subscription(
-        #         Float32,
-        #         topic,
-        #         lambda msg, thruster_idx=thruster_idx: self.subscriber_callback(
-        #             msg, thruster_idx
-        #         ),
-        #         10,
-        #     )
-
         cmd_thrust_subscription = self.create_subscription(
             JointState, "cmd_thrust", self.joint_state_subscriber_callback, 10
         )
@@ -31,29 +20,46 @@ class BarracudaThrusters(Node):
         # killswitch gpio setup #
         #########################
         try:
-            self.killswitch_pin = Button(4)
+            # self.killswitch_pin = Button(4)
+            self.killswitch_pin = 7
+            GPIO.setmode(GPIO.BOARD)
+            GPIO.setup(self.killswitch_pin, GPIO.IN)
+            GPIO.remove_event_detect(self.killswitch_pin)
 
-            def write_to_killswitch_regs(killed):
+            # def write_to_killswitch_regs(killed):
+            def write_to_killswitch_regs(channel):
                 self.get_logger().info(
-                    f"killswitch signal is now {'lo' if killed == '0'.encode() else 'hi'}"
+                    # f"killswitch signal is now {'lo' if killed == '0'.encode() else 'hi'}"
+                    f"killswitch signal is now {'lo' if GPIO.input(self.killswitch_pin) == GPIO.LOW  else 'hi'}"
                 )
                 for addr in teensy.i2c_addresses:
-                    teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, killed)
+                    teensy.write_i2c_char(addr, teensy.KILLSWITCH_REG, '0'.encode() if GPIO.input(self.killswitch_pin) == GPIO.LOW else '1'.encode())
 
             # killed reg on teensys is set to '1' by default - if the latch is closed on node startup,
             # this line sets the killed reg on teensys to '0' to enable the thrusters
-            if self.killswitch_pin.is_pressed:
+            # if self.killswitch_pin.is_pressed:
+            if GPIO.input(self.killswitch_pin) == GPIO.LOW:
                 write_to_killswitch_regs("0".encode())
 
             # "pressed": killswitch pin went lo (latch was closed) --> set killed = '0'
-            self.killswitch_pin.when_pressed = lambda: write_to_killswitch_regs(
-                "0".encode()
+            # self.killswitch_pin.when_pressed =
+            GPIO.add_event_detect(
+                self.killswitch_pin,
+                GPIO.BOTH,
+                # callback=lambda: write_to_killswitch_regs("0".encode())
+                callback=write_to_killswitch_regs
             )
 
             # "released": killswitch pin went hi (latch was opened)--> set killed = '1'
-            self.killswitch_pin.when_released = lambda: write_to_killswitch_regs(
-                "1".encode()
-            )
+            # self.killswitch_pin.when_released = lambda: write_to_killswitch_regs(
+            #     "1".encode()
+            # )
+
+            # GPIO.add_event_detect(
+            #     self.killswitch_pin,
+            #     GPIO.RISING,
+            #     callback=lambda: write_to_killswitch_regs("1".encode())
+            # )
         except Exception as e:
             self.get_logger().warn(f"problem with gpio setup: {e}")
 
@@ -73,21 +79,6 @@ class BarracudaThrusters(Node):
                     f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
                 )
 
-    # def subscriber_callback(self, msg, thruster_idx):
-    #     thruster_force_newtons = msg.data
-
-    #     # writes to teensy 0 for thrusters 0-3, teensy 1 for thrusters 4-7
-    #     try:
-    #         teensy.write_i2c_float(
-    #             teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)],
-    #             teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)],
-    #             thruster_force_newtons,
-    #         )
-    #     except Exception as e:
-    #         self.get_logger().warning(
-    #             f"Write failed at addr {teensy.i2c_addresses[thruster_idx // (self.n_thrusters // 2)]:#04x}, reg {teensy.thruster_registers[thruster_idx % (self.n_thrusters // 2)]}: {e}"
-    #         )
-
 
 def main():
     rclpy.init()
@@ -95,6 +86,8 @@ def main():
     barracuda_thrusters = BarracudaThrusters()
 
     rclpy.spin(barracuda_thrusters)
+
+    GPIO.cleanup()
 
     barracuda_thrusters.destroy_node()
 
